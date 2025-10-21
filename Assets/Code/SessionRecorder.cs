@@ -111,9 +111,7 @@ public class SessionRecorder : MonoBehaviour
         {
             if (!_encodeQ.TryDequeue(out var item)) break;
 
-            // IMPORTANT: EncodeToPNG is a Unity API → MUST run on main thread.
-            // If you notice “smearing” because the same Texture2D is reused by the feed,
-            // switch to snapshotting pixels here via GetRawTextureData().ToArray() and EncodeArrayToPNG.
+            // IMPORTANT: EncodeToPNG is a Unity API ergo MUST run on main thread.
             byte[] pngBytes = item.tex.EncodeToPNG();
 
             _writeQ.Enqueue((pngBytes, item.meta, item.idx));

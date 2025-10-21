@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.XR;
-using PassthroughCameraSamples; // matches your uploaded files
+using PassthroughCameraSamples;
 
 public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
 {
@@ -52,12 +52,11 @@ public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
         Debug.Log("[Unity] MetaCameraFeedBB: Starting camera feed.");
 
         // Configure which eye & target resolution BEFORE enabling so OnEnable uses them.
-        webCamManager.Eye = eye;                                                              // exists
-        webCamManager.RequestedResolution = requestedResolution;                              // exists
+        webCamManager.Eye = eye;
+        webCamManager.RequestedResolution = requestedResolution;
 
         // Ensure the manager is enabled; its OnEnable will request perms and start WebCamTexture.
-        if (!webCamManager.enabled) webCamManager.enabled = true;                             // uses its OnEnable()/InitializeWebCamTexture()
-                                                                                              // which creates & plays the WebCamTexture
+        if (!webCamManager.enabled) webCamManager.enabled = true; // uses its OnEnable()/InitializeWebCamTexture(), which creates & plays the WebCamTexture
         IsReady = true;
     }
 
@@ -66,7 +65,7 @@ public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
         IsReady = false;
 
         // Disabling the manager triggers its OnDisable: Stop() & Destroy() the WebCamTexture.
-        if (webCamManager) webCamManager.enabled = false;                                     // exists
+        if (webCamManager) webCamManager.enabled = false;
 
         if (_cpuReadableTex != null)
         {
@@ -81,7 +80,7 @@ public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
     {
         if (!IsReady || webCamManager == null) return;
 
-        var wct = webCamManager.WebCamTexture;                                                // property exists
+        var wct = webCamManager.WebCamTexture;
         if (wct == null || !wct.didUpdateThisFrame) return;
 
         // Prepare a readable RGBA32 buffer that matches current size
@@ -136,7 +135,6 @@ public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
         // Timestamp: WebCamTexture doesn’t expose sensor timestamps; use realtime fallback.
         long tsNs = (long)(Time.realtimeSinceStartupAsDouble * 1e9);
 
-        // Emit
         var frame = new CameraFrame
         {
             texture = _cpuReadableTex,
