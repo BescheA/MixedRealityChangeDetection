@@ -1,0 +1,18 @@
+assets/RuntimeActionBindings.json:52-638965693099344750
+assets/bin/Data/Managed/Metadata/global-metadata.dat:18555556-638965735486978650
+assets/bin/Data/Managed/Resources/Newtonsoft.Json.dll-resources.dat:900-638965735486967800
+assets/bin/Data/Managed/Resources/System.Data.dll-resources.dat:93718-638965735487843740
+assets/bin/Data/Managed/Resources/System.Drawing.dll-resources.dat:25453-638965735487936130
+assets/bin/Data/Managed/Resources/mscorlib.dll-resources.dat:337563-638965735487862720
+assets/bin/Data/Resources/unity default resources:3743732-638965693099214370
+assets/bin/Data/RuntimeInitializeOnLoads.json:10941-638965721423207190
+assets/bin/Data/ScriptingAssemblies.json:5773-638965721423209240
+assets/bin/Data/UnitySubsystems/UnityOpenXR/UnitySubsystemsManifest.json:250-638965693099347060
+assets/bin/Data/UnitySubsystems/libUnityARFoundationMeta/UnitySubsystemsManifest.json:181-638965693099347000
+assets/bin/Data/boot.config:972-638965744007670040
+assets/bin/Data/data.unity3d:31767289-638965744006384220
+assets/bin/Data/sharedassets0.resource:10880-638965744006384110
+assets/bin/Data/unity_app_guid:36-638965744058294879
+jniLibs/arm64-v8a/lib_burst_generated.so:2693672-638965735443946470
+jniLibs/arm64-v8a/libil2cpp.so:121175768-638965735552110640
+jniLibs/arm64-v8a/libmain.so:8720-638965693099175370

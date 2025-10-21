@@ -1,0 +1,5 @@
+/Users/besche/Desktop/UnityProjects2025/Test01/.utmp/RelWithDebInfo/5m596u4l/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/besche/Desktop/UnityProjects2025/Test01/.utmp/RelWithDebInfo/5m596u4l/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/besche/Desktop/UnityProjects2025/Test01/.utmp/RelWithDebInfo/5m596u4l/arm64-v8a/GameActivity/CMakeFiles/game.dir
+/Users/besche/Desktop/UnityProjects2025/Test01/.utmp/RelWithDebInfo/5m596u4l/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+/Users/besche/Desktop/UnityProjects2025/Test01/.utmp/RelWithDebInfo/5m596u4l/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir

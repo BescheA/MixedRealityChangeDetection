@@ -1,0 +1,1 @@
+/Users/besche/Desktop/UnityProjects2025/Test01/Library/PramData/AndroidApplicationController/Cache/com.UnityTechnologies.com.unity.template.urpblank/gradle-project/unityLibrary/build/intermediates/cxx/Debug/1o26f4i2/obj/arm64-v8a

@@ -1,0 +1,434 @@
+﻿/*
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ * All rights reserved.
+ *
+ * This source code is licensed under the license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Meta.WitAi;
+using ThreadState = System.Threading.ThreadState;
+
+namespace Meta.Voice.Logging
+{
+    /// <inheritdoc/>
+    internal class LogSink : ILogSink
+    {
+        private static Thread mainThread;
+
+        static LogSink()
+        {
+            ThreadUtility.CallOnMainThread(() => mainThread = Thread.CurrentThread).WrapErrors();
+        }
+
+        private static IErrorMitigator _errorMitigator;
+
+        readonly string _workingDirectory = Directory.GetCurrentDirectory();
+
+        /// <inheritdoc/>
+        public IErrorMitigator ErrorMitigator
+        {
+            get
+            {
+                if (_errorMitigator == null)
+                {
+                    _errorMitigator = new ErrorMitigator();
+                }
+
+                return _errorMitigator;
+            }
+            set => _errorMitigator = value;
+        }
+
+        /// <summary>
+        /// The log writer where all the outputs will be written.
+        /// </summary>
+        public ILogWriter LogWriter { get; set; }
+
+        /// <summary>
+        /// The logging options.
+        /// </summary>
+        public LoggerOptions Options { get; set; }
+
+        /// <summary>
+        /// Caches the last few messages so we can omit repeated correlation IDs.
+        /// </summary>
+        private readonly RingDictionaryBuffer<string, CorrelationID> _messagesCache = new(100);
+
+        internal LogSink(ILogWriter logWriter, LoggerOptions options, IErrorMitigator errorMitigator = null)
+        {
+            LogWriter = logWriter;
+            if (errorMitigator != null)
+            {
+                _errorMitigator = errorMitigator;
+            }
+
+            Options = options;
+        }
+
+        /// <summary>
+        /// Write a log entry to the sink.
+        /// </summary>
+        /// <param name="logEntry">The entry to write.</param>
+        public void WriteEntry(LogEntry logEntry)
+        {
+            var sb = new StringBuilder();
+
+#if !UNITY_EDITOR && !UNITY_ANDROID
+            {
+                // Start with datetime if not done so automatically
+                sb.Append($"[{logEntry.TimeStamp.ToShortDateString()} {logEntry.TimeStamp.ToShortTimeString()}] ");
+            }
+#endif
+
+            // Insert log type
+            var start = sb.Length;
+            sb.Append($"[VSDK] ");
+
+            if (Options.ColorLogs)
+            {
+                WrapWithLogColor(sb, start, logEntry.Verbosity);
+            }
+
+            if (string.IsNullOrEmpty(logEntry.Message) && !string.IsNullOrEmpty(logEntry.Exception.Message))
+            {
+                logEntry.Message = logEntry.Exception.Message;
+            }
+
+            Annotate(sb, logEntry);
+
+            string formattedCoreMessage;
+            try
+            {
+                formattedCoreMessage =
+                    (!string.IsNullOrEmpty(logEntry.Message) && logEntry.Parameters != null &&
+                     logEntry.Parameters.Length != 0)
+                        ? string.Format(logEntry.Message, logEntry.Parameters)
+                        : logEntry.Message;
+            }
+            catch
+            {
+                formattedCoreMessage = logEntry.Message;
+            }
+
+            sb.Append(formattedCoreMessage);
+
+            // Append the correlation ID if not repeated.
+            // We use the formatted message so we split on different parameter values even for same format string.
+            if (_messagesCache.ContainsKey(formattedCoreMessage))
+            {
+                // Move it to the top of the cache.
+                var lastId = _messagesCache.Extract(logEntry.Message);
+                _messagesCache.Add(logEntry.Message, logEntry.CorrelationID);
+
+                if (lastId.First() == logEntry.CorrelationID)
+                {
+                    sb.Append($" [{logEntry.CorrelationID}]");
+                }
+                else
+                {
+                    sb.Append($" [...]");
+                }
+            }
+            else
+            {
+                sb.Append($" [{logEntry.CorrelationID}]");
+                _messagesCache.Add(logEntry.Message, logEntry.CorrelationID);
+            }
+
+            if (logEntry.ErrorCode.HasValue && logEntry.ErrorCode.Value != null)
+            {
+                // The mitigator may not be available if the error is coming from the mitigator constructor itself.
+                if (_errorMitigator != null)
+                {
+                    sb.Append("\nMitigation: ");
+                    sb.Append(_errorMitigator.GetMitigation(logEntry.ErrorCode.Value));
+                }
+            }
+
+            if (logEntry.Verbosity >= Options.StackTraceLevel && logEntry.Context != null)
+            {
+                sb.Append("\n");
+                logEntry.Context.AppendRelevantContext(sb, Options.ColorLogs);
+            }
+
+            var message = sb.ToString();
+            if (logEntry.Exception != null)
+            {
+#if UNITY_EDITOR
+                message = string.Format(
+                    "{0}\n<color=\"#ff6666\"><b>{1}:</b> {2}</color>\n=== STACK TRACE ===\n{3}\n=====", sb,
+                    logEntry.Exception.GetType().Name, logEntry.Exception.Message,
+                    FormatStackTrace(logEntry.Exception.StackTrace));
+#endif
+            }
+
+            logEntry.Message = message;
+
+            SendEntryToLogWriter(logEntry);
+        }
+
+        private void SendEntryToLogWriter(LogEntry logEntry)
+        {
+            switch (logEntry.Verbosity)
+            {
+                case VLoggerVerbosity.Error:
+#if UNITY_EDITOR
+                    if (VLog.LogErrorsAsWarnings)
+                    {
+                        WriteWarning($"{logEntry.Prefix}{logEntry.Message}");
+                        return;
+                    }
+#endif
+                    WriteError($"{logEntry.Prefix}{logEntry.Message}");
+                    break;
+                case VLoggerVerbosity.Warning:
+                    WriteWarning($"{logEntry.Prefix}{logEntry.Message}");
+                    break;
+                case VLoggerVerbosity.Info:
+                    WriteInfo($"{logEntry.Prefix}{logEntry.Message}");
+                    break;
+                case VLoggerVerbosity.Debug:
+                    WriteDebug($"{logEntry.Prefix}{logEntry.Message}");
+                    break;
+                default:
+                    WriteVerbose($"{logEntry.Prefix}{logEntry.Message}");
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Get hex value for each log type
+        /// </summary>
+        private void WrapWithLogColor(StringBuilder builder, int startIndex, VLoggerVerbosity logType)
+        {
+#if UNITY_EDITOR
+            string hex;
+            switch (logType)
+            {
+                case VLoggerVerbosity.Error:
+                    hex = "FF0000";
+                    break;
+                case VLoggerVerbosity.Warning:
+                    hex = "FFFF00";
+                    break;
+                case VLoggerVerbosity.Debug:
+                    hex = "FF80FF";
+                    break;
+                case VLoggerVerbosity.Verbose:
+                    hex = "80FF80";
+                    break;
+                case VLoggerVerbosity.None:
+                    hex = "FFFFFF";
+                    break;
+                case VLoggerVerbosity.Info:
+                default:
+                    hex = "00FF00";
+                    break;
+            }
+            builder.Insert(startIndex, $"<color=#{hex}>");
+            builder.Append("</color>");
+#endif
+        }
+
+        private string FormatStackTrace(string stackTrace)
+        {
+            if (stackTrace == null)
+            {
+                return string.Empty;
+            }
+
+            // Use a regular expression to match lines with a file path and line number
+            var regex = new Regex(@"at (.+) in (.*):(\d+)");
+            // Use the MatchEvaluator delegate to format the matched lines
+            string Evaluator(Match match)
+            {
+                var method = match.Groups[1].Value;
+                var filePath = match.Groups[2].Value.Replace(_workingDirectory, "");
+                var lineNumber = match.Groups[3].Value;
+                // Only format the line as a clickable link if the file exists
+                if (File.Exists(filePath))
+                {
+                    var fileName = Path.GetFileName(filePath);
+                    return $"at {method} in <a href=\"{filePath}\" line=\"{lineNumber}\">{fileName}:<b>{lineNumber}</b></a>";
+                }
+                else
+                {
+                    return match.Value;
+                }
+            }
+
+            // Replace the matched lines in the stack trace
+            var formattedStackTrace = regex.Replace(stackTrace, (MatchEvaluator)Evaluator);
+            return formattedStackTrace;
+        }
+
+        /// <summary>
+        /// Adds the VSDK tag and, optionally, call site info to the string builder.
+        /// </summary>
+        /// <param name="sb">The string builder to append to.</param>
+        /// <param name="logEntry">The log entry.</param>
+        private void Annotate(StringBuilder sb, LogEntry logEntry)
+        {
+            // If cannot link to call site, only add category
+            if (!Options.LinkToCallSite)
+            {
+                if (!string.IsNullOrEmpty(logEntry.Category))
+                {
+                    sb.Append($"[{logEntry.Category}] ");
+                }
+                return;
+            }
+
+            // Get file name & file line number if applicable
+            var (callSiteFileName, callSiteLineNumber) = logEntry.Context.GetCallSite();
+#if UNITY_STANDALONE_LINUX
+            // Fix for linux machines
+            callSiteFileName = callSiteFileName.Replace('\\', Path.DirectorySeparatorChar);
+#endif
+            var fileName = Path.GetFileNameWithoutExtension(callSiteFileName);
+
+            // If not empty & not the file name, append category
+            if (!string.IsNullOrEmpty(logEntry.Category)
+                && !string.Equals(fileName, logEntry.Category))
+            {
+                sb.Append($"[{logEntry.Category}] ");
+            }
+
+            // Ignore if file name is empty
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return;
+            }
+
+#if UNITY_EDITOR
+            // Append link in editor
+            sb.Append($"<a href=\"{callSiteFileName}\" line=\"{callSiteLineNumber}\">");
+#endif
+
+            // Add file name
+            sb.Append($"[{fileName}.cs");
+            // Add call site line number if found
+            if (callSiteLineNumber > 0) sb.Append($":{callSiteLineNumber}");
+            // Add ending
+            sb.Append("]");
+
+#if UNITY_EDITOR
+            // Add link ending
+            sb.Append("</a> ");
+#else
+            // Add ending
+            sb.Append(" ");
+#endif
+        }
+
+        public void WriteVerbose(string message)
+        {
+            if (IsSafeToLog())
+            {
+                LogWriter.WriteVerbose(message);
+            }
+            else
+            {
+                ThreadUtility.CallOnMainThread(() => LogWriter.WriteVerbose(message)).WrapErrors();
+            }
+        }
+
+        public void WriteDebug(string message)
+        {
+            if (IsSafeToLog())
+            {
+                LogWriter.WriteDebug(message);
+            }
+            else
+            {
+                ThreadUtility.CallOnMainThread(() => LogWriter.WriteDebug(message)).WrapErrors();
+            }
+        }
+
+        public void WriteInfo(string message)
+        {
+            if (IsSafeToLog())
+            {
+                LogWriter.WriteInfo(message);
+            }
+            else
+            {
+                ThreadUtility.CallOnMainThread(() => LogWriter.WriteInfo(message)).WrapErrors();
+            }
+        }
+
+        public void WriteWarning(string message)
+        {
+            if (IsSafeToLog())
+            {
+                LogWriter.WriteWarning(message);
+            }
+            else
+            {
+                ThreadUtility.CallOnMainThread(() => LogWriter.WriteWarning(message)).WrapErrors();
+            }
+        }
+
+        public void WriteError(string message)
+        {
+            if (IsSafeToLog())
+            {
+                LogWriter.WriteError(message);
+            }
+            else
+            {
+                ThreadUtility.CallOnMainThread(() => LogWriter.WriteError(message)).WrapErrors();
+            }
+        }
+
+        private (string fileName, int lineNumber) GetCallSite(StackTrace stackTrace)
+        {
+            for (int i = 1; i < stackTrace.FrameCount; i++)
+            {
+                var stackFrame = stackTrace.GetFrame(i);
+                var method = stackFrame.GetMethod();
+                if (method.DeclaringType == null || IsLoggingClass(method.DeclaringType) || IsSystemClass(method.DeclaringType))
+                {
+                    continue;
+                }
+
+                var callingFileName = stackFrame.GetFileName()?.Replace('\\', '/');
+                var callingFileLineNumber = stackFrame.GetFileLineNumber();
+                return (callingFileName, callingFileLineNumber);
+            }
+
+            WriteError("Failed to get call site information.");
+            return (string.Empty, 0);
+        }
+
+        private static bool IsLoggingClass(Type type)
+        {
+            return typeof(ICoreLogger).IsAssignableFrom(type) || typeof(ILogWriter).IsAssignableFrom(type) || type == typeof(VLog);
+        }
+
+        private static bool IsSystemClass(Type type)
+        {
+            var nameSpace = type.Namespace;
+            if (nameSpace == null)
+            {
+                return false;
+            }
+            return nameSpace.StartsWith("Unity") ||
+                   nameSpace.StartsWith("System") ||
+                   nameSpace.StartsWith("Microsoft");
+        }
+
+        private bool IsSafeToLog()
+        {
+            return (Thread.CurrentThread.ThreadState & ThreadState.AbortRequested & ThreadState.Aborted) == 0 || Thread.CurrentThread == mainThread;
+        }
+    }
+}

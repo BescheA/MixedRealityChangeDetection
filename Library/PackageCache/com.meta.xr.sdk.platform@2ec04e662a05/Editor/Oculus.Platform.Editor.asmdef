@@ -1,0 +1,40 @@
+{
+    "name": "Oculus.Platform.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Oculus.Platform",
+        "Oculus.VR"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.management",
+            "expression": "",
+            "define": "USING_XR_MANAGEMENT"
+        },
+        {
+            "name": "com.unity.xr.oculus",
+            "expression": "",
+            "define": "USING_XR_SDK_OCULUS"
+        },
+        {
+            "name": "com.meta.xr.sdk.core",
+            "expression": "77.0.0",
+            "define": "USING_META_CORE_SDK_77_OR_NEWER"
+        },
+        {
+            "define": "OVR_UNITY_PACKAGE_MANAGER",
+            "name": "com.meta.xr.sdk.platform",
+            "expression": ""
+        }
+    ],
+    "noEngineReferences": false
+}
