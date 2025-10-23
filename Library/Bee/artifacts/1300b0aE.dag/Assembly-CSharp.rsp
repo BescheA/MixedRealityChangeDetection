@@ -580,7 +580,6 @@
 "Assets/Code/MetaCameraFeed.cs"
 "Assets/Code/ScanRoomButton.cs"
 "Assets/Code/SessionRecorder.cs"
-"Assets/Code/Test.cs"
 "Assets/TutorialInfo/Scripts/Readme.cs"
 "Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/BrightnessEstimation/Scripts/BrightnessEstimationDebugger.cs"
 "Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/BrightnessEstimation/Scripts/BrightnessEstimationManager.cs"

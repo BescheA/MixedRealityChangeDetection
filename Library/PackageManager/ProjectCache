@@ -1,25 +1,25 @@
 m_ProjectFiles:
   m_ManifestFileStatus:
-    m_FilePath: /Users/besche/Desktop/UnityProjects2025/Test01/Packages/manifest.json
+    m_FilePath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Packages/manifest.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638965465840000000
+      ticks: 638966659090000000
     m_Hash: 592886963
   m_LockFileStatus:
-    m_FilePath: /Users/besche/Desktop/UnityProjects2025/Test01/Packages/packages-lock.json
+    m_FilePath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Packages/packages-lock.json
     m_PathExists: 1
     m_ContentTrackingEnabled: 1
     m_ModificationDate:
       serializedVersion: 2
-      ticks: 638965465850000000
+      ticks: 638966659090000000
     m_Hash: 3089175702
 m_EmbeddedPackageManifests:
   m_ManifestsStatus: {}
 m_LocalPackages:
   m_LocalFileStatus: []
-m_ProjectPath: /Users/besche/Desktop/UnityProjects2025/Test01/Packages
+m_ProjectPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Packages
 m_EditorVersion: 6000.2.5f1 (43d04cd1df69)
 m_ResolvedPackages:
 - packageId: com.meta.xr.sdk.all@78.0.0
@@ -27,7 +27,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.sdk.all@fe3894f1edac
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.sdk.all@fe3894f1edac
   assetPath: Packages/com.meta.xr.sdk.all
   name: com.meta.xr.sdk.all
   displayName: Meta XR All-in-One SDK
@@ -203,7 +203,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 2.9.3
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.collab-proxy@ab839cc7d2ad
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.collab-proxy@ab839cc7d2ad
   assetPath: Packages/com.unity.collab-proxy
   name: com.unity.collab-proxy
   displayName: Unity Version Control
@@ -381,7 +381,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 2.0.23
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.ide.visualstudio@198cdf337d13
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.ide.visualstudio@198cdf337d13
   assetPath: Packages/com.unity.ide.visualstudio
   name: com.unity.ide.visualstudio
   displayName: Visual Studio Editor
@@ -499,7 +499,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 1.0.0
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.multiplayer.center@f3fb577b3546
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.multiplayer.center@f3fb577b3546
   assetPath: Packages/com.unity.multiplayer.center
   name: com.unity.multiplayer.center
   displayName: Multiplayer Center
@@ -595,7 +595,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 17.2.0
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.render-pipelines.universal@0d0962426023
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.render-pipelines.universal@0d0962426023
   assetPath: Packages/com.unity.render-pipelines.universal
   name: com.unity.render-pipelines.universal
   displayName: Universal Render Pipeline
@@ -722,7 +722,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 1.5.1
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.test-framework@038a2b0cacd2
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.test-framework@038a2b0cacd2
   assetPath: Packages/com.unity.test-framework
   name: com.unity.test-framework
   displayName: Test Framework
@@ -812,7 +812,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 1.8.9
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.timeline@6b9e48457ddb
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.timeline@6b9e48457ddb
   assetPath: Packages/com.unity.timeline
   name: com.unity.timeline
   displayName: Timeline
@@ -1010,7 +1010,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 2.0.4
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.toolchain.macos-arm64-linux-x86_64@53a346a622fd
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.toolchain.macos-arm64-linux-x86_64@53a346a622fd
   assetPath: Packages/com.unity.toolchain.macos-arm64-linux-x86_64
   name: com.unity.toolchain.macos-arm64-linux-x86_64
   displayName: Toolchain MacOS Arm64 Linux x64
@@ -1104,7 +1104,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 2.0.0
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.ugui@38c58105e446
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.ugui@38c58105e446
   assetPath: Packages/com.unity.ugui
   name: com.unity.ugui
   displayName: Unity UI
@@ -1200,7 +1200,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 1.9.7
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.visualscripting@6279e2b7c485
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.visualscripting@6279e2b7c485
   assetPath: Packages/com.unity.visualscripting
   name: com.unity.visualscripting
   displayName: Visual Scripting
@@ -1250,10 +1250,12 @@ m_ResolvedPackages:
     - 1.9.6
     - 1.9.7
     - 1.9.8
+    - 1.9.9
     compatible:
     - 1.9.7
     - 1.9.8
-    recommended: 1.9.8
+    - 1.9.9
+    recommended: 1.9.9
     deprecated:
     - 1.8.0-pre.1
   dependencies:
@@ -1333,7 +1335,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 3.2.1
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.xr.interaction.toolkit@76258c00be3e
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.xr.interaction.toolkit@76258c00be3e
   assetPath: Packages/com.unity.xr.interaction.toolkit
   name: com.unity.xr.interaction.toolkit
   displayName: XR Interaction Toolkit
@@ -1564,7 +1566,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 2.3.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.xr.meta-openxr@a8b13ad920dd
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.xr.meta-openxr@a8b13ad920dd
   assetPath: Packages/com.unity.xr.meta-openxr
   name: com.unity.xr.meta-openxr
   displayName: Unity OpenXR Meta
@@ -1606,7 +1608,7 @@ m_ResolvedPackages:
     - 2.3.0-pre.2
     - 2.3.0
     - 2.4.0-pre.1
-    recommended: 2.3.0
+    recommended: 2.2.1
     deprecated: []
   dependencies:
   - name: com.unity.xr.openxr
@@ -1703,7 +1705,7 @@ m_ResolvedPackages:
   unityLifecycle:
     version: 2.2.0
     nextVersion: 
-    recommendedVersion: 2.3.0
+    recommendedVersion: 
     isDeprecated: 0
     deprecationMessage: 
     isDiscoverable: 1
@@ -1743,7 +1745,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 1.15.1
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.xr.openxr@05fb1a7d75d1
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.xr.openxr@05fb1a7d75d1
   assetPath: Packages/com.unity.xr.openxr
   name: com.unity.xr.openxr
   displayName: OpenXR Plugin
@@ -1804,10 +1806,12 @@ m_ResolvedPackages:
     - 1.15.1
     - 1.16.0-pre.1
     - 1.16.0-pre.2
+    - 1.16.0
     compatible:
     - 1.15.1
     - 1.16.0-pre.1
     - 1.16.0-pre.2
+    - 1.16.0
     recommended: 1.15.1
     deprecated: []
   dependencies:
@@ -4675,7 +4679,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 1.14.2
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.inputsystem@be6c4fd0abf5
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.inputsystem@be6c4fd0abf5
   assetPath: Packages/com.unity.inputsystem
   name: com.unity.inputsystem
   displayName: Input System
@@ -4835,7 +4839,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 2.5.3
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.xr.core-utils@f0450cbac8d6
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.xr.core-utils@f0450cbac8d6
   assetPath: Packages/com.unity.xr.core-utils
   name: com.unity.xr.core-utils
   displayName: XR Core Utilities
@@ -4961,7 +4965,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 4.5.1
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.xr.management@20be87dea580
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.xr.management@20be87dea580
   assetPath: Packages/com.unity.xr.management
   name: com.unity.xr.management
   displayName: XR Plugin Management
@@ -5033,10 +5037,12 @@ m_ResolvedPackages:
     - 4.5.0
     - 4.5.1
     - 4.5.2
+    - 4.5.3
     compatible:
     - 4.5.1
     - 4.5.2
-    recommended: 4.5.2
+    - 4.5.3
+    recommended: 4.5.3
     deprecated: []
   dependencies:
   - name: com.unity.modules.vr
@@ -5132,7 +5138,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 2.1.12
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.xr.legacyinputhelpers@b7579e86f3b4
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.xr.legacyinputhelpers@b7579e86f3b4
   assetPath: Packages/com.unity.xr.legacyinputhelpers
   name: com.unity.xr.legacyinputhelpers
   displayName: XR Legacy Input Helpers
@@ -5178,8 +5184,10 @@ m_ResolvedPackages:
     - 2.1.10
     - 2.1.11
     - 2.1.12
+    - 3.0.0
     compatible:
     - 2.1.12
+    - 3.0.0
     recommended: 2.1.12
     deprecated: []
   dependencies:
@@ -5260,7 +5268,7 @@ m_ResolvedPackages:
   isDirectDependency: 1
   version: 6.3.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.xr.arfoundation@eb22901894ff
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.xr.arfoundation@eb22901894ff
   assetPath: Packages/com.unity.xr.arfoundation
   name: com.unity.xr.arfoundation
   displayName: AR Foundation
@@ -5561,7 +5569,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 2.1.1
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.xr.compositionlayers@437b07576726
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.xr.compositionlayers@437b07576726
   assetPath: Packages/com.unity.xr.compositionlayers
   name: com.unity.xr.compositionlayers
   displayName: XR Composition Layers
@@ -5581,9 +5589,11 @@ m_ResolvedPackages:
     - 2.0.0
     - 2.1.0
     - 2.1.1
+    - 2.2.0
     compatible:
     - 2.1.0
     - 2.1.1
+    - 2.2.0
     recommended: 2.1.1
     deprecated: []
   dependencies:
@@ -5682,7 +5692,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 1.3.2
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.mathematics@8017b507cc74
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.mathematics@8017b507cc74
   assetPath: Packages/com.unity.mathematics
   name: com.unity.mathematics
   displayName: Mathematics
@@ -5783,7 +5793,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 1.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.editorcoroutines@7d48783e7b8c
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.editorcoroutines@7d48783e7b8c
   assetPath: Packages/com.unity.editorcoroutines
   name: com.unity.editorcoroutines
   displayName: Editor Coroutines
@@ -5872,7 +5882,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 2.0.10
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.sysroot@7bbbb9339c14
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.sysroot@7bbbb9339c14
   assetPath: Packages/com.unity.sysroot
   name: com.unity.sysroot
   displayName: Sysroot Base
@@ -5972,7 +5982,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 2.0.9
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.sysroot.linux-x86_64@1998d1c7730e
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.sysroot.linux-x86_64@1998d1c7730e
   assetPath: Packages/com.unity.sysroot.linux-x86_64
   name: com.unity.sysroot.linux-x86_64
   displayName: Sysroot Linux x64
@@ -6073,7 +6083,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 2.0.5
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.ext.nunit@031a54704bff
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.ext.nunit@031a54704bff
   assetPath: Packages/com.unity.ext.nunit
   name: com.unity.ext.nunit
   displayName: Custom NUnit
@@ -6153,7 +6163,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 17.2.0
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.render-pipelines.core@f2c863af5658
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.render-pipelines.core@f2c863af5658
   assetPath: Packages/com.unity.render-pipelines.core
   name: com.unity.render-pipelines.core
   displayName: Scriptable Render Pipeline Core
@@ -6279,7 +6289,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 17.2.0
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.shadergraph@940512a5d7e1
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.shadergraph@940512a5d7e1
   assetPath: Packages/com.unity.shadergraph
   name: com.unity.shadergraph
   displayName: Shader Graph
@@ -6395,7 +6405,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 17.0.3
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.render-pipelines.universal-config@8dc1aab4af1d
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.render-pipelines.universal-config@8dc1aab4af1d
   assetPath: Packages/com.unity.render-pipelines.universal-config
   name: com.unity.render-pipelines.universal-config
   displayName: Universal Render Pipeline Config
@@ -6503,7 +6513,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.sdk.core@503a72ca5496
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.sdk.core@503a72ca5496
   assetPath: Packages/com.meta.xr.sdk.core
   name: com.meta.xr.sdk.core
   displayName: Meta XR Core SDK
@@ -6630,7 +6640,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.sdk.audio@2d7852661450
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.sdk.audio@2d7852661450
   assetPath: Packages/com.meta.xr.sdk.audio
   name: com.meta.xr.sdk.audio
   displayName: Meta XR Audio SDK
@@ -6746,7 +6756,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.sdk.voice@d3f6f37b8e1c
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.sdk.voice@d3f6f37b8e1c
   assetPath: Packages/com.meta.xr.sdk.voice
   name: com.meta.xr.sdk.voice
   displayName: Meta - Voice SDK - Immersive Voice Commands
@@ -6854,7 +6864,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.simulator@59c045caf4ce
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.simulator@59c045caf4ce
   assetPath: Packages/com.meta.xr.simulator
   name: com.meta.xr.simulator
   displayName: Meta XR Simulator
@@ -6963,7 +6973,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.sdk.haptics@0f1e44c58964
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.sdk.haptics@0f1e44c58964
   assetPath: Packages/com.meta.xr.sdk.haptics
   name: com.meta.xr.sdk.haptics
   displayName: Meta XR Haptics SDK
@@ -7090,7 +7100,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.mrutilitykit@13793f91651b
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.mrutilitykit@13793f91651b
   assetPath: Packages/com.meta.xr.mrutilitykit
   name: com.meta.xr.mrutilitykit
   displayName: Meta MR Utility Kit
@@ -7232,7 +7242,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.sdk.platform@2ec04e662a05
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.sdk.platform@2ec04e662a05
   assetPath: Packages/com.meta.xr.sdk.platform
   name: com.meta.xr.sdk.platform
   displayName: Meta XR Platform SDK
@@ -7358,7 +7368,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.sdk.interaction@be53de53710b
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.sdk.interaction@be53de53710b
   assetPath: Packages/com.meta.xr.sdk.interaction
   name: com.meta.xr.sdk.interaction
   displayName: Meta XR Interaction SDK Essentials
@@ -7499,7 +7509,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 78.0.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.meta.xr.sdk.interaction.ovr@a99b76803a6e
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.meta.xr.sdk.interaction.ovr@a99b76803a6e
   assetPath: Packages/com.meta.xr.sdk.interaction.ovr
   name: com.meta.xr.sdk.interaction.ovr
   displayName: "Meta XR Interaction \u200BSDK"
@@ -7648,7 +7658,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 4.9.3
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.searcher@1e17ce91558d
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.searcher@1e17ce91558d
   assetPath: Packages/com.unity.searcher
   name: com.unity.searcher
   displayName: Searcher
@@ -7680,10 +7690,12 @@ m_ResolvedPackages:
     - 4.9.1
     - 4.9.2
     - 4.9.3
+    - 4.9.4
     compatible:
     - 4.9.2
     - 4.9.3
-    recommended: 4.9.3
+    - 4.9.4
+    recommended: 4.9.4
     deprecated: []
   dependencies: []
   resolvedDependencies: []
@@ -7745,7 +7757,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 1.8.24
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.burst@f7a407abf4d5
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.burst@f7a407abf4d5
   assetPath: Packages/com.unity.burst
   name: com.unity.burst
   displayName: Burst
@@ -7980,7 +7992,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 2.5.7
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.collections@d49facba0036
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.collections@d49facba0036
   assetPath: Packages/com.unity.collections
   name: com.unity.collections
   displayName: Collections
@@ -8172,7 +8184,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 1.0.1
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.rendering.light-transport@2c9279f90d7c
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.rendering.light-transport@2c9279f90d7c
   assetPath: Packages/com.unity.rendering.light-transport
   name: com.unity.rendering.light-transport
   displayName: Unity Light Transport Library
@@ -8278,7 +8290,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 5.0.0
   source: 2
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.textmeshpro@53f43edfd2e0
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.textmeshpro@53f43edfd2e0
   assetPath: Packages/com.unity.textmeshpro
   name: com.unity.textmeshpro
   displayName: TextMeshPro
@@ -8365,7 +8377,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 2.0.9
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.ai.navigation@5218e4bf7edc
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.ai.navigation@5218e4bf7edc
   assetPath: Packages/com.unity.ai.navigation
   name: com.unity.ai.navigation
   displayName: AI Navigation
@@ -8498,7 +8510,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 3.2.1
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.nuget.newtonsoft-json@74deb55db2a0
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.nuget.newtonsoft-json@74deb55db2a0
   assetPath: Packages/com.unity.nuget.newtonsoft-json
   name: com.unity.nuget.newtonsoft-json
   displayName: Newtonsoft Json
@@ -8599,7 +8611,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 1.11.5
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.nuget.mono-cecil@d78732e851eb
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.nuget.mono-cecil@d78732e851eb
   assetPath: Packages/com.unity.nuget.mono-cecil
   name: com.unity.nuget.mono-cecil
   displayName: Mono Cecil
@@ -8694,7 +8706,7 @@ m_ResolvedPackages:
   isDirectDependency: 0
   version: 3.1.0
   source: 1
-  resolvedPath: /Users/besche/Desktop/UnityProjects2025/Test01/Library/PackageCache/com.unity.test-framework.performance@92d1d09a72ed
+  resolvedPath: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PackageCache/com.unity.test-framework.performance@92d1d09a72ed
   assetPath: Packages/com.unity.test-framework.performance
   name: com.unity.test-framework.performance
   displayName: Performance testing API
