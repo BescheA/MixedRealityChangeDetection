@@ -21,3 +21,17 @@ __pycache__/
 # Env & secrets (manage via CI/CD variables instead)
 .env
 *.env
+
+# Unity specific
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+UserSettings/
+MemoryCaptures/
+*.csproj
+*.unityproj
+*.sln
+*.suo
