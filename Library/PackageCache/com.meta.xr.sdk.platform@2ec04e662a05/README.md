@@ -1,1 +1,0 @@
-Use the Platform SDK to create social VR applications. Add Matchmaking, DLC, In-App Purchases, Cloud Storage, and more to your experience using the individual components of the SDK.

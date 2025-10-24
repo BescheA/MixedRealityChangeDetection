@@ -1,4 +1,4 @@
-Library: /Users/besche/Desktop/UnityProjects2025/Test01/Temp/BurstOutput/tempburstlibs/arm64-v8a/lib_burst_generated
+Library: /Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Temp/BurstOutput/tempburstlibs/arm64-v8a/lib_burst_generated
 --platform=Android
 --minimum-os-version=
 --backend=burst-llvm-19
@@ -9,11 +9,11 @@ Library: /Users/besche/Desktop/UnityProjects2025/Test01/Temp/BurstOutput/tempbur
 --float-precision=Standard
 --target-framework=NetFramework
 --generate-link-xml=Temp/burst.link.xml
---temp-folder=/Users/besche/Desktop/UnityProjects2025/Test01/Temp/Burst
+--temp-folder=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Temp/Burst
 --debug=Full
 --key-folder=/Applications/Unity/Hub/Editor/6000.2.5f1/PlaybackEngines/AndroidPlayer
---decode-folder=/Users/besche/Desktop/UnityProjects2025/Test01/Library/Burst
---output=/Users/besche/Desktop/UnityProjects2025/Test01/Temp/BurstOutput/tempburstlibs/arm64-v8a/lib_burst_generated
+--decode-folder=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/Burst
+--output=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Temp/BurstOutput/tempburstlibs/arm64-v8a/lib_burst_generated
 --pdb-search-paths=Temp/ManagedSymbols/
 
 --method=Unity.Jobs.IJobExtensions+JobStruct`1[[UnityEngine.XR.Interaction.Toolkit.AffordanceSystem.Jobs.Float4TweenJob, Unity.XR.Interaction.Toolkit, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Execute(UnityEngine.XR.Interaction.Toolkit.AffordanceSystem.Jobs.Float4TweenJob&, Unity.XR.Interaction.Toolkit, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Jobs.LowLevel.Unsafe.JobRanges&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--34aec427743d7d01c0cb7a219c9fbe32
@@ -83,11 +83,11 @@ Library: /Users/besche/Desktop/UnityProjects2025/Test01/Temp/BurstOutput/tempbur
 --target-framework=NetFramework
 --float-mode=Fast
 --generate-link-xml=Temp/burst.link.xml
---temp-folder=/Users/besche/Desktop/UnityProjects2025/Test01/Temp/Burst
+--temp-folder=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Temp/Burst
 --debug=Full
 --key-folder=/Applications/Unity/Hub/Editor/6000.2.5f1/PlaybackEngines/AndroidPlayer
---decode-folder=/Users/besche/Desktop/UnityProjects2025/Test01/Library/Burst
---output=/Users/besche/Desktop/UnityProjects2025/Test01/Temp/BurstOutput/tempburstlibs/arm64-v8a/lib_burst_generated
+--decode-folder=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/Burst
+--output=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Temp/BurstOutput/tempburstlibs/arm64-v8a/lib_burst_generated
 --pdb-search-paths=Temp/ManagedSymbols/
 
 --method=Unity.Jobs.IJobForExtensions+ForJobStruct`1[[UnityEngine.Rendering.Universal.ZBinningJob, Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]], UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::Execute(UnityEngine.Rendering.Universal.ZBinningJob&, Unity.RenderPipelines.Universal.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|System.IntPtr, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089|Unity.Jobs.LowLevel.Unsafe.JobRanges&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089)--77fc393cb521ac129b1392d4eb94d29a
@@ -102,11 +102,11 @@ Library: /Users/besche/Desktop/UnityProjects2025/Test01/Temp/BurstOutput/tempbur
 --float-precision=Standard
 --target-framework=NetFramework
 --generate-link-xml=Temp/burst.link.xml
---temp-folder=/Users/besche/Desktop/UnityProjects2025/Test01/Temp/Burst
+--temp-folder=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Temp/Burst
 --debug=Full
 --key-folder=/Applications/Unity/Hub/Editor/6000.2.5f1/PlaybackEngines/AndroidPlayer
---decode-folder=/Users/besche/Desktop/UnityProjects2025/Test01/Library/Burst
---output=/Users/besche/Desktop/UnityProjects2025/Test01/Temp/BurstOutput/tempburstlibs/arm64-v8a/lib_burst_generated
+--decode-folder=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/Burst
+--output=/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Temp/BurstOutput/tempburstlibs/arm64-v8a/lib_burst_generated
 --pdb-search-paths=Temp/ManagedSymbols/
 
 --method=UnityEngine.Rendering.GPUResidentDrawerBurst, Unity.RenderPipelines.GPUDriven.Runtime, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null::ClassifyMaterials(Unity.Collections.NativeArray`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]&, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Collections.NativeParallelHashMap`2+ReadOnly[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089],[UnityEngine.Rendering.BatchMaterialID, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]&, Unity.Collections, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Collections.NativeList`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]&, Unity.Collections, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Collections.NativeList`1[[System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089]]&, Unity.Collections, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null|Unity.Collections.NativeList`1[[UnityEngine.Rendering.GPUDrivenPackedMaterialData, UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]&, Unity.Collections, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null)--f259e9421b556600f769263137cdc7bc

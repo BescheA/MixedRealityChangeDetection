@@ -1,0 +1,2 @@
+/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PramData/AndroidApplicationController/Cache/com.UnityTechnologies.com.unity.template.urpblank/gradle-project/unityLibrary/src/main/cpp/CMakeLists.txt
+/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/Library/PramData/AndroidApplicationController/Cache/com.UnityTechnologies.com.unity.template.urpblank/gradle-project/unityLibrary/src/main/cpp/GameActivity/CMakeLists.txt

@@ -17,7 +17,7 @@ public struct CameraIntrinsics
 {
     public int width, height;
     public float fx, fy, cx, cy;
-    public Vector4 distortion; // k1,k2,p1,p2 (or whatever the SDK provides)
+    public Vector4 distortion;
 }
 
 [Serializable]
@@ -30,8 +30,8 @@ public struct CameraPose
 [Serializable]
 public struct CameraFrame
 {
-    public Texture2D texture;        // RGB frame for one eye (e.g., Left)
+    public Texture2D texture;
     public CameraIntrinsics intrinsics;
     public CameraPose pose;
-    public long timestampNs;         // sensor timestamp
+    public long timestampNs;
 }

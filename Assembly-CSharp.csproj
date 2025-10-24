@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/BrightnessEstimation/Scripts/BrightnessEstimationDebugger.cs" />
     <Compile Include="Assets/Code/ScanRoomButton.cs" />
+    <Compile Include="Assets/Code/Interfaces/IDepthProvider.cs" />
     <Compile Include="Assets/Code/SessionRecorder.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldCameraCanvas.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/PassthroughCameraDebugger.cs" />
@@ -61,17 +62,21 @@
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/PassthroughCameraUtils.cs" />
     <Compile Include="Assets/Code/Interfaces/ICameraFeed.cs" />
     <Compile Include="Assets/TutorialInfo/Scripts/Readme.cs" />
+    <Compile Include="Assets/Code/Data/DepthMeta.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/WebCamTextureManager.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraViewer/Scripts/CameraViewerManager.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/PassthroughCameraPermissions.cs" />
     <Compile Include="Assets/Code/MetaCameraFeed.cs" />
+    <Compile Include="Assets/Code/Interfaces/IRuntimeDepthProvider.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/StartScene/Scripts/ReturnToStartScene.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/ShaderSample/Scripts/ShaderSampleManager.cs" />
+    <Compile Include="Assets/Code/MetaDepthProvider.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/BrightnessEstimation/Scripts/BrightnessEstimationManager.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/StartScene/Scripts/LaserPointer.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets/TextMesh Pro/Shaders/TMPro.cginc" />
+    <None Include="Assets/CustomMaterial/DepthShader.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile-2-Pass.shader" />
     <None Include="Assets/TextMesh Pro/Shaders/TMP_SDF_Custom.shader" />

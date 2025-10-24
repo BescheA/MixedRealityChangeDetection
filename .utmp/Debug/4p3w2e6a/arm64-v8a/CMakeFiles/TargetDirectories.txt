@@ -1,0 +1,5 @@
+/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/.utmp/Debug/4p3w2e6a/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/.utmp/Debug/4p3w2e6a/arm64-v8a/CMakeFiles/rebuild_cache.dir
+/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/.utmp/Debug/4p3w2e6a/arm64-v8a/GameActivity/CMakeFiles/game.dir
+/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/.utmp/Debug/4p3w2e6a/arm64-v8a/GameActivity/CMakeFiles/edit_cache.dir
+/Users/besche/Desktop/UnityProjects2025/MixedRealityCD/.utmp/Debug/4p3w2e6a/arm64-v8a/GameActivity/CMakeFiles/rebuild_cache.dir
