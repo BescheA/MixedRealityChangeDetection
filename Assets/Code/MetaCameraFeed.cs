@@ -3,12 +3,14 @@ using System;
 using UnityEngine;
 using UnityEngine.XR;
 using PassthroughCameraSamples;
+using UnityEngine.InputSystem;
 
 public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
 {
     [Header("References")]
     [Tooltip("Assign the WebCamTextureManager in your scene (from the PCA sample).")]
     public WebCamTextureManager webCamManager;
+    public InputActionReference cameraFeedAction;
 
     [Header("Options")]
     public bool autoStart = true;
@@ -40,6 +42,19 @@ public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
     void Start()
     {
         if (autoStart) StartFeed();
+    }
+    void OnEnable()
+    {
+      if(cameraFeedAction != null)
+      {
+        cameraFeedAction.action.performed += OnCameraFeedActionPerformed;
+        cameraFeedAction.action.Enable();
+      }
+    }
+
+    private void OnCameraFeedActionPerformed(InputAction.CallbackContext context)
+    {
+        StartFeed();
     }
 
     public void StartFeed()
@@ -129,8 +144,8 @@ public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
 
         // Head pose (world)
         var hmd = InputDevices.GetDeviceAtXRNode(XRNode.CenterEye);
-        hmd.TryGetFeatureValue(CommonUsages.devicePosition, out Vector3 pos);
-        hmd.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rot);
+        hmd.TryGetFeatureValue(UnityEngine.XR.CommonUsages.devicePosition, out Vector3 pos);
+        hmd.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rot);
 
         // Timestamp: WebCamTexture doesn’t expose sensor timestamps; use realtime fallback.
         long tsNs = (long)(Time.realtimeSinceStartupAsDouble * 1e9);

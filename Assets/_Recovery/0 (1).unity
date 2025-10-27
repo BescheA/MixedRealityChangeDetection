@@ -5328,7 +5328,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &708017692
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7287,8 +7287,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   webCamManager: {fileID: 821463759}
-  cameraFeedAction: {fileID: -4136997484750695645, guid: 1d2cf6a261ac04922a70e639df7b0810,
-    type: 3}
   autoStart: 0
   eye: 0
   requestedResolution: {x: 1280, y: 960}
@@ -9035,8 +9033,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33ce0b97c23d44954ab8953ba074cbee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  recordAction: {fileID: 6178804260892192958, guid: 1d2cf6a261ac04922a70e639df7b0810,
-    type: 3}
   cameraFeedBehaviour: {fileID: 984774586}
   depthProviderBehaviour: {fileID: 1457056745}
   recordButton: {fileID: 0}
@@ -11512,7 +11508,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _buttonClickActions:
-  - Title: Start Camera Feed
+  - Title: Spawn spatial anchor
     Button: 1
     ButtonMode: 0
     InputActionReference: {fileID: 0}
@@ -11522,19 +11518,20 @@ MonoBehaviour:
     Callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 984774586}
-          m_TargetAssemblyTypeName: MetaCameraFeedBB, Assembly-CSharp
-          m_MethodName: StartFeed
-          m_Mode: 1
+        - m_Target: {fileID: 959695759}
+          m_TargetAssemblyTypeName: Meta.XR.BuildingBlocks.SpatialAnchorSpawnerBuildingBlock,
+            Meta.XR.BuildingBlocks
+          m_MethodName: SpawnSpatialAnchor
+          m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_ObjectArgumentAssemblyTypeName: 
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-  - Title: Start Recording
+  - Title: Load and spawn spatial anchors
     Button: 2
     ButtonMode: 0
     InputActionReference: {fileID: 0}
@@ -11544,13 +11541,37 @@ MonoBehaviour:
     Callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 1276338522}
-          m_TargetAssemblyTypeName: SessionRecorder, Assembly-CSharp
-          m_MethodName: Toggle
-          m_Mode: 1
+        - m_Target: {fileID: 959695758}
+          m_TargetAssemblyTypeName: Meta.XR.BuildingBlocks.SpatialAnchorLoaderBuildingBlock,
+            Meta.XR.BuildingBlocks
+          m_MethodName: LoadAnchorsFromDefaultLocalStorage
+          m_Mode: 0
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Title: Erase all spatial anchors
+    Button: 32768
+    ButtonMode: 0
+    InputActionReference: {fileID: 0}
+    CallbackWithContext:
+      m_PersistentCalls:
+        m_Calls: []
+    Callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 708017692}
+          m_TargetAssemblyTypeName: Meta.XR.BuildingBlocks.SpatialAnchorCoreBuildingBlock,
+            Meta.XR.BuildingBlocks
+          m_MethodName: EraseAllAnchors
+          m_Mode: 0
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
             m_IntArgument: 0
             m_FloatArgument: 0
             m_StringArgument: 

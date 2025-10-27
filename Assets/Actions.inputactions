@@ -1,0 +1,75 @@
+{
+    "version": 1,
+    "name": "Actions",
+    "maps": [
+        {
+            "name": "Main",
+            "id": "41acfbe7-9768-43cd-a73f-43f4314a73bb",
+            "actions": [
+                {
+                    "name": "CameraFeed",
+                    "type": "Button",
+                    "id": "ca7a26b6-39b8-4ae7-90cf-4c87578a8034",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Snapshot",
+                    "type": "Button",
+                    "id": "fbda25f5-49d9-470b-834f-e39122700f64",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Record",
+                    "type": "Button",
+                    "id": "67d309a2-1c8e-44cb-898f-b27fae7cc50d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "be94adce-7bed-4c38-bb31-dbf24c503b75",
+                    "path": "<QuestProTouchController>/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "CameraFeed",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9b976ba3-afa9-437c-8135-e62f3d0ba981",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Snapshot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1ffbc653-7000-41ba-aa3e-96f13e69445c",
+                    "path": "<QuestProTouchController>/secondaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Record",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

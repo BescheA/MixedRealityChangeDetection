@@ -9,10 +9,12 @@ using UnityEngine.UI;
 using UnityEngine.Rendering;
 using TMPro; // AsyncGPUReadback for depth
 using changeDetection.Recording;
+using UnityEngine.InputSystem;
 
 public class SessionRecorder : MonoBehaviour
 {
     [Header("References")]
+    public InputActionReference recordAction; // optional input action to toggle recording
     public MonoBehaviour cameraFeedBehaviour;    // implements ICameraFeed (your existing feed)
     public MonoBehaviour depthProviderBehaviour; // implements IDepthProvider (see bottom)
     public Button recordButton;                  // optional toggle button
@@ -44,6 +46,17 @@ public class SessionRecorder : MonoBehaviour
         if (_feed != null) _feed.OnFrame += OnFrame;
         if (recordButton) recordButton.onClick.AddListener(Toggle);
     }
+    private void OnEnable() {
+        if(recordAction != null) {
+            recordAction.action.performed += OnRecordActionPerformed;
+            recordAction.action.Enable();
+        }
+    }
+
+    private void OnRecordActionPerformed(InputAction.CallbackContext context)
+    {
+        Toggle();
+    }
 
     void OnDestroy()
     {
@@ -67,7 +80,7 @@ public class SessionRecorder : MonoBehaviour
         }
 
         _idx = 0;
-        var stamp = DateTime.UtcNow.ToString("yyyyMMdd_HHmmss");
+        var stamp = DateTime.UtcNow.AddHours(1.0).ToString("yyyyMMdd_HHmmss"); // UTC+1
         _dir = Path.Combine(Application.persistentDataPath, $"session_{stamp}");
         Directory.CreateDirectory(_dir);
         File.WriteAllText(Path.Combine(_dir, "session_info.json"), "{\"version\":2}");
@@ -167,7 +180,7 @@ public class SessionRecorder : MonoBehaviour
                 didWork = true;
                 try
                 {
-                    string baseName = $"frame_{c.idx:000000}";
+                    string baseName = $"{c.idx:000000}_color";
                     string pngPath  = Path.Combine(_dir, baseName + ".png");
                     string jsonPath = Path.Combine(_dir, baseName + ".json");
 
@@ -188,7 +201,7 @@ public class SessionRecorder : MonoBehaviour
                 didWork = true;
                 try
                 {
-                    string baseName  = $"frame_{d.idx:000000}";
+                    string baseName  = $"{d.idx:000000}_depth";
                     string depthPath = Path.Combine(_dir, baseName + "_depth.exr");
                     string jsonPath  = Path.Combine(_dir, baseName + ".json");
 
@@ -234,12 +247,18 @@ public class SessionRecorder : MonoBehaviour
                     m.intrinsics.distortion.z, m.intrinsics.distortion.w
                 }
             };
-
+            Matrix4x4 rotationMatrix = Matrix4x4.Rotate(m.pose.rotation_world);
+            rotationMatrix.m03 = m.pose.position_world.x;
+            rotationMatrix.m13 = m.pose.position_world.y;
+            rotationMatrix.m23 = m.pose.position_world.z;
             f.pose = new PoseDTO
             {
-                position = new float[] { m.pose.position_world.x, m.pose.position_world.y, m.pose.position_world.z },
-                rotation = new float[] { m.pose.rotation_world.x, m.pose.rotation_world.y, m.pose.rotation_world.z, m.pose.rotation_world.w }
+                //position = new float[] { m.pose.position_world.x, m.pose.position_world.y, m.pose.position_world.z },
+                extrinsics = rotationMatrix
+                //rotation = new float[] { m.pose.rotation_world.x, m.pose.rotation_world.y, m.pose.rotation_world.z, m.pose.rotation_world.w }
             };
+
+            //Matrix4x4 rotationMatrix = Matrix4x4.Rotate(m.pose.rotation_world);
         }
 /*
         if (!string.IsNullOrEmpty(colorPath))
@@ -299,11 +318,15 @@ public class SessionRecorder : MonoBehaviour
                     m.intrinsics.distortion.z, m.intrinsics.distortion.w
                 }
             };
-
+            Matrix4x4 rotationMatrix = Matrix4x4.Rotate(m.pose.rotation_world);
+            rotationMatrix.m03 = m.pose.position_world.x;
+            rotationMatrix.m13 = m.pose.position_world.y;
+            rotationMatrix.m23 = m.pose.position_world.z;
             f.pose = new PoseDTO
             {
-                position = new float[] { m.pose.position_world.x, m.pose.position_world.y, m.pose.position_world.z },
-                rotation = new float[] { m.pose.rotation_world.x, m.pose.rotation_world.y, m.pose.rotation_world.z, m.pose.rotation_world.w }
+                //position = new float[] { m.pose.position_world.x, m.pose.position_world.y, m.pose.position_world.z },
+                extrinsics = rotationMatrix
+                //rotation = new float[] { m.pose.rotation_world.x, m.pose.rotation_world.y, m.pose.rotation_world.z, m.pose.rotation_world.w }
             };
         }
 /*
@@ -331,8 +354,8 @@ public class SessionRecorder : MonoBehaviour
     }
     [Serializable] struct PoseDTO
     {
-        public float[] position; // world meters
-        public float[] rotation; // quaternion (x,y,z,w)
+        //public float[] position; // world meters
+        public Matrix4x4 extrinsics; // quaternion (x,y,z,w)
     }
     [Serializable] struct DepthDTO
     {
