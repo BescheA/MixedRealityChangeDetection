@@ -17,7 +17,6 @@ public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
     public PassthroughCameraEye eye = PassthroughCameraEye.Left;   // Left/Right are supported by the manager
     [Tooltip("Requested camera resolution (0,0 uses the largest available).")]
     public Vector2Int requestedResolution = new Vector2Int(1280, 960);
-
     public bool IsReady { get; private set; }
     public event Action<CameraFrame> OnFrame;
 

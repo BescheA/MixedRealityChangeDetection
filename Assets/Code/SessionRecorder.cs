@@ -180,9 +180,10 @@ public class SessionRecorder : MonoBehaviour
                 didWork = true;
                 try
                 {
-                    string baseName = $"{c.idx:000000}_color";
-                    string pngPath  = Path.Combine(_dir, baseName + ".png");
-                    string jsonPath = Path.Combine(_dir, baseName + ".json");
+                    string baseNameColor = $"{c.idx:000000}_color";
+                    string baseNameMetaData = $"{c.idx:000000}_pose";
+                    string pngPath  = Path.Combine(_dir, baseNameColor + ".png");
+                    string jsonPath = Path.Combine(_dir, baseNameMetaData + ".json");
 
                     await File.WriteAllBytesAsync(pngPath, c.png, ct);
 
@@ -201,9 +202,10 @@ public class SessionRecorder : MonoBehaviour
                 didWork = true;
                 try
                 {
-                    string baseName  = $"{d.idx:000000}_depth";
+                    string baseName = $"{d.idx:000000}_depth";
+                    string baseNameMetaData = $"{c.idx:000000}_pose";
                     string depthPath = Path.Combine(_dir, baseName + "_depth.exr");
-                    string jsonPath  = Path.Combine(_dir, baseName + ".json");
+                    string jsonPath  = Path.Combine(_dir, baseNameMetaData + ".json");
 
                     await File.WriteAllBytesAsync(depthPath, d.exr, ct);
 
