@@ -53,6 +53,7 @@
     <Compile Include="Assets/Code/Interfaces/IDepthProvider.cs" />
     <Compile Include="Assets/Code/SessionRecorder.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldCameraCanvas.cs" />
+    <Compile Include="Assets/Code/Data/MRUKToJSON.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/PassthroughCameraDebugger.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldManager.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldRayRenderer.cs" />

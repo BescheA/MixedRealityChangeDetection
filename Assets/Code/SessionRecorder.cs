@@ -150,14 +150,17 @@ public class SessionRecorder : MonoBehaviour
     void Update()
     {
         // throttle encodes to avoid main-thread spikes
-        const int maxColorEncodesPerFrame = 2;
-        const int maxDepthEncodesPerFrame = 2;
+        // lower defaults to reduce main-thread stalls; increase only if you measure it's safe
+        const int maxColorEncodesPerFrame = 1;
+        const int maxDepthEncodesPerFrame = 1;
 
         for (int n = 0; n < maxColorEncodesPerFrame; n++)
         {
             if (!_encodeColorQ.TryDequeue(out var item)) break;
             byte[] pngBytes = item.tex.EncodeToPNG();
             _writeColorQ.Enqueue((pngBytes, item.meta, item.idx));
+            // free the temporary texture we created earlier to avoid accumulating GPU/CPU memory
+            try { UnityEngine.Object.Destroy(item.tex); } catch { }
         }
 
         for (int n = 0; n < maxDepthEncodesPerFrame; n++)
@@ -166,6 +169,8 @@ public class SessionRecorder : MonoBehaviour
             // EXR preserves float depth (lossless)
             byte[] exrBytes = ImageConversion.EncodeToEXR(d.tex, Texture2D.EXRFlags.OutputAsFloat);
             _writeDepthQ.Enqueue((exrBytes, d.meta, d.idx));
+            // free the temporary depth texture
+            try { UnityEngine.Object.Destroy(d.tex); } catch { }
         }
     }
 
@@ -203,7 +208,7 @@ public class SessionRecorder : MonoBehaviour
                 try
                 {
                     string baseName = $"{d.idx:000000}_depth";
-                    string baseNameMetaData = $"{c.idx:000000}_pose";
+                    string baseNameMetaData = $"{d.idx:000000}_pose";
                     string depthPath = Path.Combine(_dir, baseName + "_depth.exr");
                     string jsonPath  = Path.Combine(_dir, baseNameMetaData + ".json");
 
