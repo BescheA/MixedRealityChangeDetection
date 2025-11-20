@@ -49,12 +49,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/BrightnessEstimation/Scripts/BrightnessEstimationDebugger.cs" />
+    <Compile Include="Assets/Code/ChangeDetectionVisualizer.cs" />
     <Compile Include="Assets/Code/ScanRoomButton.cs" />
+    <Compile Include="Assets/Code/ScansContainerManipulation.cs" />
+    <Compile Include="Assets/Code/ScriptableObjects/RoomTable.cs" />
     <Compile Include="Assets/Code/Interfaces/IDepthProvider.cs" />
+    <Compile Include="Assets/Code/loadMap.cs" />
     <Compile Include="Assets/Code/SessionRecorder.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldCameraCanvas.cs" />
     <Compile Include="Assets/Code/Data/MRUKToJSON.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/PassthroughCameraDebugger.cs" />
+    <Compile Include="Assets/Code/ScriptableObjects/Room.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldManager.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldRayRenderer.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/StartScene/Scripts/DebugUIBuilder.cs" />

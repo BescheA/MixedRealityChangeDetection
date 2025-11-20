@@ -32,13 +32,22 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "LoadMap",
+                    "type": "Button",
+                    "id": "ac1a9a5f-3c2c-413c-82cd-c82b9cf14495",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
                 {
                     "name": "",
                     "id": "be94adce-7bed-4c38-bb31-dbf24c503b75",
-                    "path": "<QuestProTouchController>/primaryButton",
+                    "path": "<XRController>{RightHand}/primaryButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -65,6 +74,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Record",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "437756a1-6753-4aef-842d-5d8bef481f0f",
+                    "path": "<XRController>{LeftHand}/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LoadMap",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
