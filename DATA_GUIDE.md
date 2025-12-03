@@ -176,38 +176,52 @@ Quaternion scanRotation = scanTransform.rotation;
 
 ### Loading Sequence:
 1. **`loadMap.LoadSelectedMap(hashID)`**
+   - **File**: `Assets/Code/loadMap.cs` (lines ~129-187)
    - Loads `<hashID>.json` → MapData
    - Loads RoomTable from Resources
+   - Calls `ProcessMapData()` on successful load
 
 2. **`ChangeDetectionVisualizer.LoadDatabases(hashID)`**
+   - **File**: `Assets/Code/ChangeDetectionVisualizer.cs` (lines ~73-80)
    - Loads `semseg_<hashID>.json` → Object geometry
    - Loads `groundtruth_labels.csv` → Labels
-   - Applies manual corrections (e.g., ID 10: chair → table)
+   - Applies manual corrections via `ApplyCorrections()` (lines ~40-61)
 
 3. **`loadMap.ProcessMapData()`**
+   - **File**: `Assets/Code/loadMap.cs` (lines ~239-398)
    - Creates ScansContainer with global rotation
    - Instantiates reference room mesh at origin
    - For each rescan:
      - Instantiates rescan mesh with `scan.transform`
-     - Visualizes removed objects (red boxes)
-     - Visualizes rigid objects (blue boxes)
+     - Calls `VisualizeRemovedObjects()` (red boxes)
+     - Calls `VisualizeRigidObjects()` (blue boxes)
+   - Calls `AnalyzeAmbiguity()` for mislabel detection
 
 4. **`ChangeDetectionVisualizer.CreateBoundingBox()`**
+   - **File**: `Assets/Code/ChangeDetectionVisualizer.cs` (lines ~540-650)
    - Uses semseg OBB data for initial position/rotation/scale
-   - Stores as "reference" transform
-   - Optionally applies manual corrections
+   - Stores as "reference" transform in `objectTransforms` dictionary
+   - Optionally applies manual corrections from `corrections` dictionary (lines ~18-35)
 
 5. **`ChangeDetectionVisualizer.AssignRescanTransforms()`**
+   - **File**: `Assets/Code/ChangeDetectionVisualizer.cs` (lines ~683-710)
    - Iterates through MapData rigid transforms
    - Calculates rescan position: `rigidMatrix * referencePosition`
    - Stores both reference and rescan transforms
-   - Toggle `showRescanBoundingBoxes` to switch between views
+   - Calls `RefreshBoundingBoxesTransform()` to apply changes
+
+6. **`ChangeDetectionVisualizer.RefreshBoundingBoxesTransform()`**
+   - **File**: `Assets/Code/ChangeDetectionVisualizer.cs` (lines ~715-740)
+   - Toggles between reference and rescan positions based on `showRescanBoundingBoxes`
+   - Updates all bounding box transforms in real-time
 
 ---
 
 ## Key Classes & Data Structures
 
 ### C# Classes (`loadMap.cs`):
+**Location**: `Assets/Code/loadMap.cs` (lines ~10-48)
+
 ```csharp
 public class MapData {
     public string reference;
@@ -232,6 +246,8 @@ public class RigidTransform {
 ```
 
 ### C# Classes (`ChangeDetectionVisualizer.cs`):
+**Location**: `Assets/Code/ChangeDetectionVisualizer.cs` (lines ~10-48)
+
 ```csharp
 public class SegGroupData {
     public int objectId;
@@ -247,9 +263,26 @@ public class OBBData {
 }
 ```
 
+### Manual Corrections System:
+**Location**: `Assets/Code/ChangeDetectionVisualizer.cs` (lines ~18-35)
+
+```csharp
+private readonly Dictionary<int, ObjectCorrection> corrections = new Dictionary<int, ObjectCorrection>
+{
+    { 10, new ObjectCorrection {
+        labelOverride = "table",
+        position = new Vector3(1.263f, -0.379f, -1.221f),
+        rotationEuler = new Vector3(272.15686f, 90f, 270f),
+        scale = new Vector3(1.073f, 0.765f, 1.914f)
+    }}
+};
+```
+
 ---
 
 ## Matrix Conversion (Row-Major → Unity Column-Major)
+
+**Location**: `Assets/Code/loadMap.cs` → `GetMatrixFromFloatArray()` (lines ~465-480)
 
 The JSON stores matrices in **row-major** order (standard mathematical notation), but Unity uses **column-major**. We transpose during loading:
 
