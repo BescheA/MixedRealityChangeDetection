@@ -302,6 +302,8 @@ return matrix.transpose;
 
 ## Coordinate System Conversions
 
+**Location**: `Assets/Code/ChangeDetectionVisualizer.cs` → `CreateBoundingBox()` (lines ~590-620)
+
 ### Why Negate X-Axis?
 ```csharp
 Vector3 center = new Vector3(
@@ -313,6 +315,7 @@ Vector3 center = new Vector3(
 The data uses a different coordinate system convention. Negating X aligns it with Unity's left-handed coordinate system.
 
 ### Why Invert Rotation Axes?
+**Location**: Lines ~630-635 in `CreateBoundingBox()`
 ```csharp
 eulerAngles.z = -eulerAngles.z;
 eulerAngles.x = -eulerAngles.x;
@@ -323,18 +326,40 @@ Compensates for coordinate system handedness differences between the data source
 
 ## Inspector Toggles & Features
 
-### `showRescanBoundingBoxes` (ChangeDetectionVisualizer)
-- **false**: Shows objects in reference scan position (from semseg OBB)
-- **true**: Shows objects in rescan position (OBB transformed by rigid matrix)
+### Key Inspector Variables:
 
-### `enableDebugLogs` (loadMap & ChangeDetectionVisualizer)
-- Logs all transform matrices, positions, rotations
-- Shows rigid transform extraction details
-- Displays ambiguity analysis warnings
+#### In `ChangeDetectionVisualizer` component:
+**File**: `Assets/Code/ChangeDetectionVisualizer.cs`
 
-### `visualizeRemovedObjects` (loadMap)
-- **true**: Creates red bounding boxes for removed objects
-- Also creates blue boxes for rigid objects when enabled
+- **`showRescanBoundingBoxes`** (line ~66)
+  - **false**: Shows objects in reference scan position (from semseg OBB)
+  - **true**: Shows objects in rescan position (OBB transformed by rigid matrix)
+  - Updated in real-time via `Update()` method (lines ~755-762)
+
+- **`enableDebugLogs`** (line ~65)
+  - Logs all transform matrices, positions, rotations
+  - Shows rigid transform extraction details
+  - Displays ambiguity analysis warnings
+
+- **`useOBB`** (line ~62)
+  - **true**: Uses oriented bounding boxes (OBB) with rotation
+  - **false**: Falls back to axis-aligned bounding boxes (AABB)
+
+#### In `loadMap` component:
+**File**: `Assets/Code/loadMap.cs`
+
+- **`visualizeRemovedObjects`** (line ~82)
+  - **true**: Creates red bounding boxes for removed objects
+  - Also creates blue boxes for rigid objects when enabled
+
+- **`enableDebugLogs`** (line ~85)
+  - Logs MapData loading, scan processing
+  - Shows ExtractRigidTransforms() output
+  - Displays matrix calculations and transformations
+
+- **`globalRotation`** (line ~71)
+  - Applied to entire ScansContainer
+  - Default: `Vector3(-90, 0, 0)` to align with Unity world space
 
 ---
 

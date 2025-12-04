@@ -42,7 +42,7 @@
     <UnityVersion>6000.2.5f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Analyzer Include="/Users/besche/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.1.3/Analyzers/Microsoft.Unity.Analyzers.dll" />
+    <Analyzer Include="/Users/besche/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.2.0/Analyzers/Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="/Applications/Unity/Hub/Editor/6000.2.5f1/Unity.app/Contents/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll" />
     <Analyzer Include="/Applications/Unity/Hub/Editor/6000.2.5f1/Unity.app/Contents/Tools/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="/Applications/Unity/Hub/Editor/6000.2.5f1/Unity.app/Contents/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll" />
@@ -51,17 +51,22 @@
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/BrightnessEstimation/Scripts/BrightnessEstimationDebugger.cs" />
     <Compile Include="Assets/Code/ChangeDetectionVisualizer.cs" />
     <Compile Include="Assets/Code/ScanRoomButton.cs" />
-    <Compile Include="Assets/Code/ScansContainerManipulation.cs" />
+    <Compile Include="Assets/Code/UI/BackToMainMenuButton.cs" />
     <Compile Include="Assets/Code/ScriptableObjects/RoomTable.cs" />
     <Compile Include="Assets/Code/Interfaces/IDepthProvider.cs" />
     <Compile Include="Assets/Code/loadMap.cs" />
     <Compile Include="Assets/Code/SessionRecorder.cs" />
+    <Compile Include="Assets/Code/UI/LoadMapButton.cs" />
+    <Compile Include="Assets/Code/UI/Button.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldCameraCanvas.cs" />
+    <Compile Include="Assets/Code/ScansContainerManipulation_v2.cs" />
     <Compile Include="Assets/Code/Data/MRUKToJSON.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/PassthroughCameraDebugger.cs" />
     <Compile Include="Assets/Code/ScriptableObjects/Room.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldManager.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldRayRenderer.cs" />
+    <Compile Include="Assets/Code/UI/SwitchUIButton.cs" />
+    <Compile Include="Assets/Code/UI/SelectMapButton.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/StartScene/Scripts/DebugUIBuilder.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/StartScene/Scripts/HandedInputSelector.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/StartScene/Scripts/StartMenu.cs" />

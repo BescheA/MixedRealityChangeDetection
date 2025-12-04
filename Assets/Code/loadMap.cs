@@ -1,9 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
+/**
+        Position of Map: -0.2, 1.5, 0.5
+        Rotation of Map: -90, 0, 0
+        Scale of Map: 0.1, 0.1, 0.1
+**/
 /// <summary>
 /// JSON data structures for change detection
 /// </summary>
@@ -53,10 +60,15 @@ public class loadMap : MonoBehaviour
     private GameObject roomMesh;
     [Header("Provide Scene Hash for automatic RoomTable loading")]
     public string SceneHash;
+    public Dictionary<string, bool> Scenes;
     private RoomTable RoomTable;
 
     [Header("Input Action for Loading Map")]
     public InputActionReference loadMapAction;
+    
+    [Header("Input Actions for Container Manipulation")]
+    public InputActionReference rightThumbstickAction;
+    public InputActionReference leftThumbstickAction;
     
     [Header("Global Rotation for All Scans")]
     public Vector3 globalRotation = new Vector3(-90, 0, 0);
@@ -77,7 +89,20 @@ public class loadMap : MonoBehaviour
     
     void Start()
     {
-        
+        Scenes = new Dictionary<string, bool>()
+        {
+            {"0cac7578-8d6f-2d13-8c2d-bfa7a04f8af3", false},
+            {"f62fd5f8-9a3f-2f44-8b1e-1289a3a61e26", true}
+        };
+        foreach (var scene in Scenes)
+        {
+            if (scene.Value)
+            {
+                SceneHash = scene.Key;
+                if (enableDebugLogs) Debug.Log($"[LoadMap] Selected SceneHash: {SceneHash}");
+                break;
+            }
+        }
     }
     private void OnEnable()
     {
@@ -233,6 +258,14 @@ public class loadMap : MonoBehaviour
         if (changeDetectionVisualizer != null && visualizeRemovedObjects)
         {
             changeDetectionVisualizer.LoadDatabases(mapReference);
+            // Ambiguity Analyse direkt nach Laden durchführen
+            changeDetectionVisualizer.AnalyzeAmbiguity(mapData);
+        }
+        
+        // Extract and log rigid transform data
+        if (enableDebugLogs)
+        {
+            ExtractRigidTransforms(mapData);
         }
         
         scansContainer = new GameObject($"ScansContainer_{mapReference}");
@@ -242,6 +275,19 @@ public class loadMap : MonoBehaviour
         // Add manipulation script for grabbing, rotating, and scaling
         var manipulationScript = scansContainer.AddComponent<ScansContainerManipulation>();
         manipulationScript.enableDebugLogs = enableDebugLogs;
+        
+        // Assign Input Actions if available
+        if (rightThumbstickAction != null)
+        {
+            manipulationScript.rightThumbstickAction = rightThumbstickAction;
+            if (enableDebugLogs) Debug.Log($"[LoadMap] Assigned right thumbstick action to container");
+        }
+        
+        if (leftThumbstickAction != null)
+        {
+            manipulationScript.leftThumbstickAction = leftThumbstickAction;
+            if (enableDebugLogs) Debug.Log($"[LoadMap] Assigned left thumbstick action to container");
+        }
         
         if (enableDebugLogs) Debug.Log($"Scans container created with global rotation: {globalRotation}");
 
@@ -347,10 +393,21 @@ public class loadMap : MonoBehaviour
                         go.transform.localRotation = rotation;
                         if (enableDebugLogs) Debug.Log($"Instantiated rescan object local position: {go.transform.localPosition} | global position: {go.transform.position}");
                         
-                        if (changeDetectionVisualizer != null && visualizeRemovedObjects && scan.removed != null && scan.removed.Count > 0)
+                        if (changeDetectionVisualizer != null && visualizeRemovedObjects)
                         {
-                            if (enableDebugLogs) Debug.Log($"Visualizing {scan.removed.Count} removed objects for scan {scan.reference}");
-                            changeDetectionVisualizer.VisualizeRemovedObjects(scan.removed, scansContainer.transform, scan.reference);
+                            // Visualize removed objects (red)
+                            if (scan.removed != null && scan.removed.Count > 0)
+                            {
+                                if (enableDebugLogs) Debug.Log($"Visualizing {scan.removed.Count} removed objects for scan {scan.reference}");
+                                changeDetectionVisualizer.VisualizeRemovedObjects(scan.removed, scansContainer.transform, scan.reference);
+                            }
+                            
+                            // Visualize rigid objects (blue)
+                            if (scan.rigid != null && scan.rigid.Count > 0)
+                            {
+                                if (enableDebugLogs) Debug.Log($"Visualizing {scan.rigid.Count} rigid objects for scan {scan.reference}");
+                                changeDetectionVisualizer.VisualizeRigidObjects(scan.rigid, scansContainer.transform, scan.reference);
+                            }
                         }
                     }
                     catch (Exception e)
@@ -407,6 +464,94 @@ public class loadMap : MonoBehaviour
         matrix.m30 = matrixArray[12]; matrix.m31 = matrixArray[13]; matrix.m32 = matrixArray[14]; matrix.m33 = matrixArray[15];
         
         return matrix.transpose;
+    }
+
+    /// <summary>
+    /// Extracts position and rotation from all rigid transforms in the map data
+    /// </summary>
+    /// <param name="mapData">The map data containing rigid transforms</param>
+    public void ExtractRigidTransforms(MapData mapData)
+    {
+        if (mapData == null || mapData.scans == null)
+        {
+            Debug.LogWarning("[ExtractRigidTransforms] MapData or scans is null");
+            return;
+        }
+
+        Debug.Log($"[ExtractRigidTransforms] Processing {mapData.scans.Count} scans");
+
+        foreach (var scan in mapData.scans)
+        {
+            if (scan.rigid == null || scan.rigid.Count == 0)
+            {
+                Debug.Log($"[ExtractRigidTransforms] Scan '{scan.reference}' has no rigid transforms");
+                continue;
+            }
+
+            Debug.Log($"[ExtractRigidTransforms] Scan '{scan.reference}' has {scan.rigid.Count} rigid transforms:");
+
+            foreach (var rigidTransform in scan.rigid)
+            {
+                if (rigidTransform.transform == null || rigidTransform.transform.Length != 16)
+                {
+                    Debug.LogWarning($"[ExtractRigidTransforms] Invalid transform for instance {rigidTransform.instance_reference}");
+                    continue;
+                }
+
+                // Convert float array to Matrix4x4
+                Matrix4x4 matrix = GetMatrixFromFloatArray(rigidTransform.transform);
+
+                // Extract position and rotation
+                Vector3 position = matrix.GetPosition();
+                Quaternion rotation = matrix.rotation;
+                Vector3 eulerAngles = rotation.eulerAngles;
+
+                // Log the data
+                Debug.Log($"  Instance Reference: {rigidTransform.instance_reference} | Instance Rescan: {rigidTransform.instance_rescan}");
+                Debug.Log($"    Position: ({position.x:F3}, {position.y:F3}, {position.z:F3})");
+                Debug.Log($"    Rotation (Quaternion): ({rotation.x:F3}, {rotation.y:F3}, {rotation.z:F3}, {rotation.w:F3})");
+                Debug.Log($"    Rotation (Euler): ({eulerAngles.x:F2}°, {eulerAngles.y:F2}°, {eulerAngles.z:F2}°)");
+                Debug.Log($"    Symmetry: {rigidTransform.symmetry}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets position and rotation for a specific instance reference
+    /// </summary>
+    /// <param name="mapData">The map data to search</param>
+    /// <param name="instanceReference">The instance reference ID to find</param>
+    /// <param name="position">Output position</param>
+    /// <param name="rotation">Output rotation</param>
+    /// <returns>True if found, false otherwise</returns>
+    public bool GetRigidTransformForInstance(MapData mapData, int instanceReference, out Vector3 position, out Quaternion rotation)
+    {
+        position = Vector3.zero;
+        rotation = Quaternion.identity;
+
+        if (mapData == null || mapData.scans == null)
+            return false;
+
+        foreach (var scan in mapData.scans)
+        {
+            if (scan.rigid == null) continue;
+
+            foreach (var rigidTransform in scan.rigid)
+            {
+                if (rigidTransform.instance_reference == instanceReference)
+                {
+                    if (rigidTransform.transform != null && rigidTransform.transform.Length == 16)
+                    {
+                        Matrix4x4 matrix = GetMatrixFromFloatArray(rigidTransform.transform);
+                        position = matrix.GetPosition();
+                        rotation = matrix.rotation;
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
