@@ -59,7 +59,6 @@
     <Compile Include="Assets/Code/UI/LoadMapButton.cs" />
     <Compile Include="Assets/Code/UI/Button.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraToWorld/Scripts/CameraToWorldCameraCanvas.cs" />
-    <Compile Include="Assets/Code/ScansContainerManipulation_v2.cs" />
     <Compile Include="Assets/Code/Data/MRUKToJSON.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/PassthroughCameraDebugger.cs" />
     <Compile Include="Assets/Code/ScriptableObjects/Room.cs" />
@@ -74,6 +73,7 @@
     <Compile Include="Assets/Code/Interfaces/ICameraFeed.cs" />
     <Compile Include="Assets/TutorialInfo/Scripts/Readme.cs" />
     <Compile Include="Assets/Code/Data/DepthMeta.cs" />
+    <Compile Include="Assets/Code/MapViewerController.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/WebCamTextureManager.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/CameraViewer/Scripts/CameraViewerManager.cs" />
     <Compile Include="Assets/Unity-PassthroughCameraApiSamples-main/Assets/PassthroughCameraApiSamples/PassthroughCamera/Scripts/PassthroughCameraPermissions.cs" />

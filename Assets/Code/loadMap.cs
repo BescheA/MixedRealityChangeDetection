@@ -73,10 +73,17 @@ public class loadMap : MonoBehaviour
     [Header("Global Rotation for All Scans")]
     public Vector3 globalRotation = new Vector3(-90, 0, 0);
     
+    [Header("Spawn Transform Options")]
+    public Vector3 spawnPosition = new Vector3(-0.2f, 1.5f, 0.5f);
+    public float spawnScale = 0.1f;
+    
     [Header("Transform Options")]
     public bool useInverseTransform = false;
     public bool invertPositionX = false;
     public bool invertRotationZ = false;
+    
+    [Header("Map Viewer Controller")]
+    public MapViewerController mapViewerController;
     
     [Header("Change Detection Visualization")]
     public ChangeDetectionVisualizer changeDetectionVisualizer;
@@ -143,33 +150,27 @@ public class loadMap : MonoBehaviour
         }
         
         // Auto-load RoomTable from Resources folder (works both in Editor and on Device)
-        if (RoomTable == null)
+        // Always reload to ensure correct RoomTable for the current mapReference
+        string roomTablePath = $"ScriptableObjects/{mapReference}/RoomTable";
+        Debug.Log($"[LoadMap] Attempting to load RoomTable from: Resources/{roomTablePath}");
+        RoomTable = Resources.Load<RoomTable>(roomTablePath);
+        
+        if (RoomTable != null)
         {
-            string roomTablePath = $"ScriptableObjects/{mapReference}/RoomTable";
-            Debug.Log($"[LoadMap] Attempting to load RoomTable from: Resources/{roomTablePath}");
-            RoomTable = Resources.Load<RoomTable>(roomTablePath);
-            
-            if (RoomTable != null)
-            {
-                Debug.Log($"[LoadMap] Successfully loaded RoomTable from Resources: {roomTablePath}");
-            }
-            else
-            {
-                Debug.LogError($"[LoadMap] RoomTable not found at Resources/{roomTablePath}");
-                Debug.LogError($"[LoadMap] Please ensure Assets/Resources/ScriptableObjects/{mapReference}/RoomTable.asset exists");
-                
-                // Try to list what's actually in Resources
-                UnityEngine.Object[] allResources = Resources.LoadAll("ScriptableObjects", typeof(RoomTable));
-                Debug.LogError($"[LoadMap] Found {allResources.Length} RoomTable assets in Resources/ScriptableObjects/");
-                foreach (var res in allResources)
-                {
-                    Debug.LogError($"[LoadMap]   - {res.name}");
-                }
-            }
+            Debug.Log($"[LoadMap] Successfully loaded RoomTable from Resources: {roomTablePath}");
         }
         else
         {
-            Debug.Log($"[LoadMap] RoomTable already assigned, skipping auto-load");
+            Debug.LogError($"[LoadMap] RoomTable not found at Resources/{roomTablePath}");
+            Debug.LogError($"[LoadMap] Please ensure Assets/Resources/ScriptableObjects/{mapReference}/RoomTable.asset exists");
+            
+            // Try to list what's actually in Resources
+            UnityEngine.Object[] allResources = Resources.LoadAll("ScriptableObjects", typeof(RoomTable));
+            Debug.LogError($"[LoadMap] Found {allResources.Length} RoomTable assets in Resources/ScriptableObjects/");
+            foreach (var res in allResources)
+            {
+                Debug.LogError($"[LoadMap]   - {res.name}");
+            }
         }
         
         string mapDataPath = Path.Combine(Application.streamingAssetsPath, $"{mapReference}.json");
@@ -196,29 +197,26 @@ public class loadMap : MonoBehaviour
 #if UNITY_ANDROID && !UNITY_EDITOR
     private System.Collections.IEnumerator LoadMapDataFromStreamingAssets(string relativePath, string mapReference)
     {
-        // Load RoomTable first if not already loaded
-        if (RoomTable == null)
+        // Always reload RoomTable to ensure correct RoomTable for the current mapReference
+        string roomTablePath = $"ScriptableObjects/{mapReference}/RoomTable";
+        Debug.Log($"[LoadMap-Android] Attempting to load RoomTable from: Resources/{roomTablePath}");
+        RoomTable = Resources.Load<RoomTable>(roomTablePath);
+        
+        if (RoomTable != null)
         {
-            string roomTablePath = $"ScriptableObjects/{mapReference}/RoomTable";
-            Debug.Log($"[LoadMap-Android] Attempting to load RoomTable from: Resources/{roomTablePath}");
-            RoomTable = Resources.Load<RoomTable>(roomTablePath);
+            Debug.Log($"[LoadMap-Android] Successfully loaded RoomTable from Resources: {roomTablePath}");
+        }
+        else
+        {
+            Debug.LogError($"[LoadMap-Android] RoomTable not found at Resources/{roomTablePath}");
+            Debug.LogError($"[LoadMap-Android] Please ensure Assets/Resources/ScriptableObjects/{mapReference}/RoomTable.asset exists");
             
-            if (RoomTable != null)
+            // Try to list what's actually in Resources
+            UnityEngine.Object[] allResources = Resources.LoadAll("ScriptableObjects", typeof(RoomTable));
+            Debug.LogError($"[LoadMap-Android] Found {allResources.Length} RoomTable assets in Resources/ScriptableObjects/");
+            foreach (var res in allResources)
             {
-                Debug.Log($"[LoadMap-Android] Successfully loaded RoomTable from Resources: {roomTablePath}");
-            }
-            else
-            {
-                Debug.LogError($"[LoadMap-Android] RoomTable not found at Resources/{roomTablePath}");
-                Debug.LogError($"[LoadMap-Android] Please ensure Assets/Resources/ScriptableObjects/{mapReference}/RoomTable.asset exists");
-                
-                // Try to list what's actually in Resources
-                UnityEngine.Object[] allResources = Resources.LoadAll("ScriptableObjects", typeof(RoomTable));
-                Debug.LogError($"[LoadMap-Android] Found {allResources.Length} RoomTable assets in Resources/ScriptableObjects/");
-                foreach (var res in allResources)
-                {
-                    Debug.LogError($"[LoadMap-Android]   - {res.name}");
-                }
+                Debug.LogError($"[LoadMap-Android]   - {res.name}");
             }
         }
         
@@ -268,26 +266,33 @@ public class loadMap : MonoBehaviour
             ExtractRigidTransforms(mapData);
         }
         
+        // Destroy old scans container if it exists
+        if (scansContainer != null)
+        {
+            Destroy(scansContainer);
+            if (enableDebugLogs) Debug.Log("[ProcessMapData] Destroyed old ScansContainer");
+        }
+        
         scansContainer = new GameObject($"ScansContainer_{mapReference}");
-        scansContainer.transform.position = Vector3.zero;
+        scansContainer.transform.position = spawnPosition;
         scansContainer.transform.rotation = Quaternion.Euler(globalRotation);
+        scansContainer.transform.localScale = Vector3.one * spawnScale;
         
-        // Add manipulation script for grabbing, rotating, and scaling
-        var manipulationScript = scansContainer.AddComponent<ScansContainerManipulation>();
-        manipulationScript.enableDebugLogs = enableDebugLogs;
+        // Add Rigidbody for physics-based interaction
+        var rigidbody = scansContainer.AddComponent<Rigidbody>();
+        rigidbody.isKinematic = true; // kinematic so it doesn't fall
+        rigidbody.useGravity = false;
         
-        // Assign Input Actions if available
-        if (rightThumbstickAction != null)
-        {
-            manipulationScript.rightThumbstickAction = rightThumbstickAction;
-            if (enableDebugLogs) Debug.Log($"[LoadMap] Assigned right thumbstick action to container");
-        }
+        // Add BoxCollider for XR Grab detection (only one on parent)
+        var collider = scansContainer.AddComponent<BoxCollider>();
+        collider.isTrigger = false;
+        collider.size = Vector3.one * 0.5f; // Default size, will be adjusted after mesh spawn
         
-        if (leftThumbstickAction != null)
-        {
-            manipulationScript.leftThumbstickAction = leftThumbstickAction;
-            if (enableDebugLogs) Debug.Log($"[LoadMap] Assigned left thumbstick action to container");
-        }
+        // Add XRGrabInteractable for Meta XR controller grabbing
+        var grabInteractable = scansContainer.AddComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+        grabInteractable.trackPosition = true;
+        grabInteractable.trackRotation = true;
+        
         
         if (enableDebugLogs) Debug.Log($"Scans container created with global rotation: {globalRotation}");
 
@@ -302,8 +307,10 @@ public class loadMap : MonoBehaviour
             {
                 roomMesh = room.roomMesh;
                 var go = Instantiate(roomMesh, Vector3.zero, Quaternion.identity, scansContainer.transform);
-                go.transform.localRotation = Quaternion.Euler(Vector3.zero);
-                if (enableDebugLogs) Debug.Log($"Instantiated initial reference: {mapReference} at position (0,0,0), is position: {go.transform.position} | Rotation: {go.transform.rotation}");
+                go.transform.localPosition = Vector3.zero;
+                go.transform.localRotation = Quaternion.identity;
+                go.name = $"{roomMesh.name}_reference";
+                if (enableDebugLogs) Debug.Log($"Instantiated initial reference: {mapReference} at local position (0,0,0), global position: {go.transform.position}");
             }
             else
             {
@@ -391,6 +398,7 @@ public class loadMap : MonoBehaviour
                         var go = Instantiate(scanRoomMesh, scansContainer.transform);
                         go.transform.localPosition = position;
                         go.transform.localRotation = rotation;
+                        go.name = $"{scanRoomMesh.name}_{scan.reference}";
                         if (enableDebugLogs) Debug.Log($"Instantiated rescan object local position: {go.transform.localPosition} | global position: {go.transform.position}");
                         
                         if (changeDetectionVisualizer != null && visualizeRemovedObjects)
@@ -420,6 +428,70 @@ public class loadMap : MonoBehaviour
                     if (enableDebugLogs) Debug.LogWarning($"No global transformation found for scan: {scan.reference} - skipping");
                 }
             }
+        }
+        
+        // After all meshes are spawned, resize parent collider to fit all children
+        ResizeParentCollider();
+        
+        // Initialize the MapViewerController with the spawned container
+        if (mapViewerController != null)
+        {
+            mapViewerController.Initialize(scansContainer);
+            if (enableDebugLogs) Debug.Log("[ProcessMapData] MapViewerController initialized");
+        }
+        else
+        {
+            Debug.LogWarning("[ProcessMapData] MapViewerController not assigned in Inspector");
+        }
+    }
+    
+    /// <summary>
+    /// Resizes the parent container's collider to fit all child meshes
+    /// </summary>
+    private void ResizeParentCollider()
+    {
+        var collider = scansContainer.GetComponent<BoxCollider>();
+        if (collider == null)
+        {
+            if (enableDebugLogs) Debug.LogWarning("[ResizeParentCollider] BoxCollider not found on container");
+            return;
+        }
+        
+        // Calculate combined bounds of all child renderers
+        Bounds combinedBounds = new Bounds(Vector3.zero, Vector3.zero);
+        bool hasRenderers = false;
+        
+        foreach (var renderer in scansContainer.GetComponentsInChildren<Renderer>())
+        {
+            if (!hasRenderers)
+            {
+                combinedBounds = renderer.bounds;
+                hasRenderers = true;
+            }
+            else
+            {
+                combinedBounds.Encapsulate(renderer.bounds);
+            }
+        }
+        
+        if (hasRenderers)
+        {
+            // Convert world bounds to local bounds
+            Vector3 localCenter = scansContainer.transform.InverseTransformPoint(combinedBounds.center);
+            Vector3 localSize = scansContainer.transform.InverseTransformVector(combinedBounds.size);
+            
+            collider.center = localCenter;
+            collider.size = localSize * 1.1f; // 10% padding for easier grabbing
+            
+            if (enableDebugLogs)
+            {
+                Debug.Log($"[ResizeParentCollider] Bounds center: {combinedBounds.center}, size: {combinedBounds.size}");
+                Debug.Log($"[ResizeParentCollider] Collider center: {collider.center}, size: {collider.size}");
+            }
+        }
+        else
+        {
+            if (enableDebugLogs) Debug.LogWarning("[ResizeParentCollider] No renderers found in container children");
         }
     }
 

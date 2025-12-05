@@ -75,6 +75,9 @@ public class ChangeDetectionVisualizer : MonoBehaviour
     /// </summary>
     public void LoadDatabases(string scanReference)
     {
+        // Clear old bounding boxes from previous map loads
+        ClearBoundingBoxes();
+        
 #if UNITY_ANDROID && !UNITY_EDITOR
         StartCoroutine(LoadDatabasesAsync(scanReference));
 #else
@@ -529,6 +532,7 @@ public class ChangeDetectionVisualizer : MonoBehaviour
         {
             Destroy(boundingBoxContainer);
             boundingBoxContainer = null;
+            if (enableDebugLogs) Debug.Log("[ChangeDetectionVisualizer] Cleared all bounding boxes");
         }
         rescanContainers.Clear();
     }
