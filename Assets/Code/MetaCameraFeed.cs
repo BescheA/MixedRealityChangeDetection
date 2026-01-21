@@ -44,11 +44,11 @@ public class MetaCameraFeedBB : MonoBehaviour, ICameraFeed
     }
     void OnEnable()
     {
-      if(cameraFeedAction != null)
+      /*if(cameraFeedAction != null)
       {
         cameraFeedAction.action.performed += OnCameraFeedActionPerformed;
         cameraFeedAction.action.Enable();
-      }
+      }*/
     }
 
     private void OnCameraFeedActionPerformed(InputAction.CallbackContext context)

@@ -14,6 +14,8 @@ public class MetaDepthProviderURP : MonoBehaviour, IDepthProvider
     [Header("Options")]
     [SerializeField] private DepthEye eye = DepthEye.Left;
     [SerializeField] private Vector2Int fallbackSize = new Vector2Int(512, 512);
+    [SerializeField] [Tooltip("Horizontal FOV in degrees for both RGB and Depth cameras (typical: 85-95°)")]
+    private float horizontalFov = 90f;
 
     private ICameraFeed _feed;
     private bool _hasIntrinsics;
@@ -83,12 +85,29 @@ public class MetaDepthProviderURP : MonoBehaviour, IDepthProvider
 
     public DepthMeta GetDepthMeta()
     {
-        int w = _singleEyeRT ? _singleEyeRT.width  : (_hasIntrinsics ? _lastIntrinsics.width  : fallbackSize.x);
-        int h = _singleEyeRT ? _singleEyeRT.height : (_hasIntrinsics ? _lastIntrinsics.height : fallbackSize.y);
+        int w = _singleEyeRT ? _singleEyeRT.width  : fallbackSize.x;
+        int h = _singleEyeRT ? _singleEyeRT.height : fallbackSize.y;
 
-        var intr = _hasIntrinsics
-            ? _lastIntrinsics
-            : new CameraIntrinsics { width = w, height = h, fx = 0, fy = 0, cx = w * 0.5f, cy = h * 0.5f, distortion = Vector4.zero };
+        // Calculate depth camera intrinsics from FOV
+        // fx = width / (2 * tan(hfov/2))
+        float hfovRad = horizontalFov * Mathf.Deg2Rad;
+        float fx = w / (2f * Mathf.Tan(hfovRad * 0.5f));
+        
+        // Estimate vertical FOV from aspect ratio
+        float aspectRatio = (float)w / h;
+        float vfovRad = 2f * Mathf.Atan(Mathf.Tan(hfovRad * 0.5f) / aspectRatio);
+        float fy = h / (2f * Mathf.Tan(vfovRad * 0.5f));
+
+        var intr = new CameraIntrinsics 
+        { 
+            width = w, 
+            height = h, 
+            fx = fx, 
+            fy = fy, 
+            cx = w * 0.5f, 
+            cy = h * 0.5f, 
+            distortion = Vector4.zero 
+        };
 
         return new DepthMeta
         {

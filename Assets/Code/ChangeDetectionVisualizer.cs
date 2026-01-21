@@ -51,7 +51,10 @@ public class LabelData
 }
 
 public class ChangeDetectionVisualizer : MonoBehaviour
-{
+
+{    
+    // Guard für asynchrone Ladevorgänge
+    private string currentLoadingScanReference = null;
     [Header("Paths")]
     public string semsegJsonPath = "semseg.v2.json"; // Deprecated - now using semseg_<HashID>.json
     public string csvPath = "groundtruth_labels.csv"; // Deprecated - now using groundtruth_<HashID>.csv
@@ -67,30 +70,41 @@ public class ChangeDetectionVisualizer : MonoBehaviour
     
     private Dictionary<int, SegGroupData> segGroupDatabase = new Dictionary<int, SegGroupData>();
     private Dictionary<int, LabelData> labelDatabase = new Dictionary<int, LabelData>();
-    private GameObject boundingBoxContainer;
+    public GameObject boundingBoxContainer;
     private Dictionary<string, GameObject> rescanContainers = new Dictionary<string, GameObject>();
     
     /// <summary>
     /// Loads semantic segmentation and label databases for a given scan reference
     /// </summary>
-    public void LoadDatabases(string scanReference)
-    {
-        // Clear old bounding boxes from previous map loads
+        public Action OnDatabasesLoaded; // Callback für Visualisierung nach Ladevorgang
+        public void LoadDatabases(string scanReference, Action onLoaded = null)
+        {
+        currentLoadingScanReference = scanReference;
         ClearBoundingBoxes();
-        
-#if UNITY_ANDROID && !UNITY_EDITOR
+        OnDatabasesLoaded = onLoaded;
+    #if UNITY_ANDROID && !UNITY_EDITOR
         StartCoroutine(LoadDatabasesAsync(scanReference));
-#else
+    #else
         LoadSemanticSegmentation(scanReference);
         LoadGroundTruthLabels();
-#endif
-    }
+        // Direkt Callback aufrufen, da synchron
+        if (OnDatabasesLoaded != null) OnDatabasesLoaded();
+    #endif
+        }
     
 #if UNITY_ANDROID && !UNITY_EDITOR
     public IEnumerator LoadDatabasesAsync(string scanReference)
     {
         yield return StartCoroutine(LoadSemanticSegmentationAsync(scanReference));
         yield return StartCoroutine(LoadGroundTruthLabelsAsync());
+        // Guard: Nur fortfahren, wenn dies noch die aktuelle Anfrage ist
+        if (scanReference != currentLoadingScanReference)
+        {
+            if (enableDebugLogs) Debug.LogWarning($"[ChangeDetectionVisualizer] Coroutine abgebrochen, weil scanReference gewechselt wurde: {scanReference} != {currentLoadingScanReference}");
+            yield break;
+        }
+        // Callback für Visualisierung nach erfolgreichem Laden
+        if (OnDatabasesLoaded != null) OnDatabasesLoaded();
     }
     
     public IEnumerator LoadSemanticSegmentationAsync(string scanReference)
@@ -304,7 +318,9 @@ public class ChangeDetectionVisualizer : MonoBehaviour
     /// <param name="parentTransform">Parent transform to attach bounding boxes to</param>
     /// <param name="rescanHash">Hash ID of the rescan to organize bounding boxes</param>
     public void VisualizeRemovedObjects(List<int> removedIDs, Transform parentTransform, string rescanHash)
+        
     {
+        if (enableDebugLogs) Debug.Log($"[ChangeDetectionVisualizer] VisualizeRemovedObjects für rescanHash: {rescanHash}");
         if (boundingBoxContainer == null)
         {
             boundingBoxContainer = new GameObject("RemovedObjects_BoundingBoxes");
@@ -361,7 +377,9 @@ public class ChangeDetectionVisualizer : MonoBehaviour
     /// <param name="parentTransform">Parent transform to attach bounding boxes to</param>
     /// <param name="rescanHash">Hash ID of the rescan to organize bounding boxes</param>
     public void VisualizeRigidObjects(List<RigidTransform> rigidTransforms, Transform parentTransform, string rescanHash)
+        
     {
+        if (enableDebugLogs) Debug.Log($"[ChangeDetectionVisualizer] VisualizeRigidObjects für rescanHash: {rescanHash}");
         if (rigidTransforms == null || rigidTransforms.Count == 0)
         {
             if (enableDebugLogs) Debug.Log($"No rigid objects to visualize for rescan {rescanHash}");
@@ -421,7 +439,9 @@ public class ChangeDetectionVisualizer : MonoBehaviour
     }
 
     public void VisualizeMovedObjects(List<int> movedIDs, Transform parentTransform, string rescanHash)
+        
     {
+        if (enableDebugLogs) Debug.Log($"[ChangeDetectionVisualizer] VisualizeMovedObjects für rescanHash: {rescanHash}");
         // Implementation for visualizing moved objects can be added here
     }
     
@@ -527,14 +547,23 @@ public class ChangeDetectionVisualizer : MonoBehaviour
     /// Clears all bounding box visualizations
     /// </summary>
     public void ClearBoundingBoxes()
+        
     {
-        if (boundingBoxContainer != null)
+        if (enableDebugLogs) Debug.Log($"[ChangeDetectionVisualizer] ClearBoundingBoxes aufgerufen. Aktuelle scanReference: {currentLoadingScanReference}");
+        // Entferne ALLE BoundingBox-Container in der Szene, nicht nur das Feld
+        var allBoundingBoxes = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+        int removed = 0;
+        foreach (var go in allBoundingBoxes)
         {
-            Destroy(boundingBoxContainer);
-            boundingBoxContainer = null;
-            if (enableDebugLogs) Debug.Log("[ChangeDetectionVisualizer] Cleared all bounding boxes");
+            if (go != null && go.name == "RemovedObjects_BoundingBoxes")
+            {
+                Destroy(go);
+                removed++;
+            }
         }
+        boundingBoxContainer = null;
         rescanContainers.Clear();
+        if (enableDebugLogs) Debug.Log($"[ChangeDetectionVisualizer] Cleared all bounding boxes (removed {removed})");
     }
     
     /// <summary>
@@ -561,7 +590,9 @@ public class ChangeDetectionVisualizer : MonoBehaviour
     /// <param name="mapData">Geladene MapData mit ambiguity Gruppen</param>
     /// <param name="visualizeSuspicious">Erstellt gelbe Bounding Box für verdächtige Objekte</param>
     public void AnalyzeAmbiguity(MapData mapData, bool visualizeSuspicious = true)
+        
     {
+        if (enableDebugLogs) Debug.Log($"[ChangeDetectionVisualizer] AnalyzeAmbiguity aufgerufen. Aktuelle scanReference: {currentLoadingScanReference}");
         if (mapData == null || mapData.ambiguity == null || mapData.ambiguity.Count == 0)
         {
             if (enableDebugLogs) Debug.Log("[AmbiguityAnalysis] Keine Ambiguity Daten vorhanden");

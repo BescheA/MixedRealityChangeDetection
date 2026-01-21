@@ -50,18 +50,17 @@ public class SessionRecorder : MonoBehaviour
         _depth = depthProviderBehaviour as IDepthProvider;
 
         if (_feed != null) _feed.OnFrame += OnFrame;
-        if (recordButton) recordButton.onClick.AddListener(Toggle);
     }
     private void OnEnable() {
-        if(recordAction != null) {
+        /*if(recordAction != null) {
             recordAction.action.performed += OnRecordActionPerformed;
             recordAction.action.Enable();
-        }
+        }*/
     }
 
     private void OnRecordActionPerformed(InputAction.CallbackContext context)
     {
-        Toggle();
+        //Toggle();
     }
 
     void OnDestroy()
@@ -76,39 +75,39 @@ public class SessionRecorder : MonoBehaviour
         }
     }
 
-    public void Toggle() => (_recording ? (Action)StopRecording : StartRecording)();
+
+    // Toggle is not used anymore. Use StartRecording and StopRecording directly from UI.
 
     public void StartRecording()
     {
+        // Idempotent: do nothing if already recording
+        if (_recording) return;
+
+        // Start camera feed if not running
         if (_feed == null || !_feed.IsReady)
         {
-            Debug.LogWarning("Recorder: camera feed not ready. Starting camera feed first...");
-            
-            // Start camera feed if it's available
-            if (_feed is MonoBehaviour camMonoBehaviour && camMonoBehaviour is ICameraFeed)
+            Debug.Log("SessionRecorder: Camera feed not ready, starting feed...");
+            MonoBehaviour camMono = cameraFeedBehaviour as MonoBehaviour;
+            if (camMono != null)
             {
-                var startMethod = camMonoBehaviour.GetType().GetMethod("StartFeed", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                var startMethod = camMono.GetType().GetMethod("StartFeed", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
                 if (startMethod != null)
                 {
-                    startMethod.Invoke(camMonoBehaviour, null);
-                    Debug.Log("Recorder: Camera feed started. Waiting for ready state...");
-                    // Give it a moment to initialize
-                    return;
+                    startMethod.Invoke(camMono, null);
                 }
             }
-            else if (cameraFeedBehaviour != null)
+            // Wait for feed to become ready (simple poll, could be improved with event/callback)
+            float waitStart = Time.realtimeSinceStartup;
+            float timeout = 5f;
+            while (_feed != null && !_feed.IsReady && (Time.realtimeSinceStartup - waitStart) < timeout)
             {
-                var startMethod = cameraFeedBehaviour.GetType().GetMethod("StartFeed", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                if (startMethod != null)
-                {
-                    startMethod.Invoke(cameraFeedBehaviour, null);
-                    Debug.Log("Recorder: Camera feed started. Waiting for ready state...");
-                    return;
-                }
+                System.Threading.Thread.Sleep(50);
             }
-
-            Debug.LogError("Recorder: Could not start camera feed.");
-            return;
+            if (_feed == null || !_feed.IsReady)
+            {
+                Debug.LogError("SessionRecorder: Camera feed could not be started or is not ready.");
+                return;
+            }
         }
 
         if (_depth != null && !_depth.IsReady)
@@ -125,7 +124,7 @@ public class SessionRecorder : MonoBehaviour
         _cts = new CancellationTokenSource();
         _recording = true;
         _recordingStartTime = DateTime.UtcNow.AddHours(1.0); // UTC+1
-        
+
         if (recordButtonText) recordButtonText.text = "Stop Recording";
 
         // Start encoder thread (moves encoding from main thread to background)
@@ -149,17 +148,20 @@ public class SessionRecorder : MonoBehaviour
 
     public void StopRecording()
     {
+        // Idempotent: do nothing if not recording
+        if (!_recording) return;
+
         _recording = false;
         if (recordButtonText) recordButtonText.text = "Start Recording";
-        
+
         // Calculate duration and total frames collected
         DateTime endTime = DateTime.UtcNow.AddHours(1.0); // UTC+1
         TimeSpan duration = endTime - _recordingStartTime;
         int totalFrames = _idx;
-        
+
         // Stop encoder thread (allow it to finish encoding queued items)
         StopEncoderThread();
-        
+
         // Stop writer thread (allow it to finish writing queued items)
         _writerThreadRunning = false;
         if (_writerThread != null)
@@ -167,13 +169,27 @@ public class SessionRecorder : MonoBehaviour
             _writerThread.Join(TimeSpan.FromSeconds(5));
             _writerThread = null;
         }
-        
+
         _cts?.Cancel();
         _cts = null;
-        
+
         // Update info text with session summary
         UpdateInfoText($"Session Ended\nFrames Collected: {totalFrames}\nDuration: {duration:hh\\:mm\\:ss}\nTimestamp: {endTime:yyyy-MM-dd HH:mm:ss}");
         Debug.Log("Recording stopped.");
+
+        // Stop camera feed if running
+        if (_feed != null && _feed.IsReady)
+        {
+            MonoBehaviour camMono = cameraFeedBehaviour as MonoBehaviour;
+            if (camMono != null)
+            {
+                var stopMethod = camMono.GetType().GetMethod("StopFeed", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                if (stopMethod != null)
+                {
+                    stopMethod.Invoke(camMono, null);
+                }
+            }
+        }
     }
 
     void OnFrame(CameraFrame f)
@@ -232,111 +248,61 @@ public class SessionRecorder : MonoBehaviour
         }
     }
 
-    // Encoder thread: runs on background thread, pulls from encode queues and pushes to write queues
-    private Thread _encoderThread;
-    private volatile bool _encoderThreadRunning;
 
-    void StartEncoderThread()
-    {
-        if (_encoderThread != null && _encoderThread.IsAlive) return;
-
-        _encoderThreadRunning = true;
-        _encoderThread = new Thread(() => EncoderLoopThread())
-        {
-            Name = "SessionRecorder.EncoderThread",
-            IsBackground = true,
-            Priority = System.Threading.ThreadPriority.BelowNormal
-        };
-        _encoderThread.Start();
-    }
-
-    void StopEncoderThread()
-    {
-        _encoderThreadRunning = false;
-        if (_encoderThread != null)
-        {
-            _encoderThread.Join(TimeSpan.FromSeconds(5));
-            _encoderThread = null;
-        }
-    }
-
-    /// <summary>
-    /// Runs on background thread. Encodes textures to PNG/EXR without blocking main thread.
-    /// </summary>
-    void EncoderLoopThread()
-    {
-        try
-        {
-            while (_encoderThreadRunning || !_encodeColorQ.IsEmpty || !_encodeDepthQ.IsEmpty)
-            {
-                bool didWork = false;
-
-                // Encode color frames (PNG)
-                if (_encodeColorQ.TryDequeue(out var colorItem))
-                {
-                    didWork = true;
-                    try
-                    {
-                        // Heavy work on background thread - no main thread impact
-                        byte[] pngBytes = colorItem.tex.EncodeToPNG();
-                        _writeColorQ.Enqueue((pngBytes, colorItem.meta, colorItem.idx));
-                        
-                        // Free temporary texture
-                        try { UnityEngine.Object.Destroy(colorItem.tex); } catch { }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError("EncoderLoopThread(Color): " + e);
-                    }
-                }
-
-                // Encode depth frames (EXR)
-                if (_encodeDepthQ.TryDequeue(out var depthItem))
-                {
-                    didWork = true;
-                    try
-                    {
-                        // Heavy work on background thread - no main thread impact
-                        byte[] exrBytes = ImageConversion.EncodeToEXR(depthItem.tex, Texture2D.EXRFlags.OutputAsFloat);
-                        _writeDepthQ.Enqueue((exrBytes, depthItem.meta, depthItem.idx));
-                        
-                        // Free temporary texture
-                        try { UnityEngine.Object.Destroy(depthItem.tex); } catch { }
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError("EncoderLoopThread(Depth): " + e);
-                    }
-                }
-
-                if (!didWork)
-                {
-                    Thread.Sleep(1); // Yield if no work
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Debug.LogError("EncoderLoopThread crashed: " + e);
-        }
-        finally
-        {
-            _encoderThreadRunning = false;
-            Debug.Log("EncoderLoopThread finished");
-        }
-    }
+    // Encoder-Thread entfernt, Encoding läuft jetzt im Main Thread (Update)
+    // Dummy-Methoden für Kompatibilität (werden nicht mehr genutzt)
+    void StartEncoderThread() { }
+    void StopEncoderThread() { }
 
     void Update()
     {
-        // Main thread: just pump frames into encode queue, let background thread handle encoding
-        // This removes the main-thread blocking that was happening with EncodeToPNG() and EncodeToEXR()
         if (!_recording) return;
 
-        // OnFrame() already enqueues to _encodeColorQ and _encodeDepthQ
-        // So nothing to do here except ensure encoder thread is alive if we're recording
-        if (_recording && (_encoderThread == null || !_encoderThread.IsAlive))
+        // Encoding jetzt im Main Thread: PNG/EXR Encoding und Übergabe an Write-Queue
+        int maxFramesPerUpdate = 4; // Limitiert, um Framedrops zu vermeiden
+        int framesProcessed = 0;
+
+        while (!_encodeColorQ.IsEmpty && framesProcessed < maxFramesPerUpdate)
         {
-            StartEncoderThread();
+            if (_encodeColorQ.TryDequeue(out var colorItem))
+            {
+                try
+                {
+                    byte[] pngBytes = colorItem.tex.EncodeToPNG();
+                    _writeColorQ.Enqueue((pngBytes, colorItem.meta, colorItem.idx));
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("MainThread EncodeToPNG: " + e);
+                }
+                finally
+                {
+                    try { UnityEngine.Object.Destroy(colorItem.tex); } catch { }
+                }
+                framesProcessed++;
+            }
+        }
+
+        framesProcessed = 0;
+        while (!_encodeDepthQ.IsEmpty && framesProcessed < maxFramesPerUpdate)
+        {
+            if (_encodeDepthQ.TryDequeue(out var depthItem))
+            {
+                try
+                {
+                    byte[] exrBytes = ImageConversion.EncodeToEXR(depthItem.tex, Texture2D.EXRFlags.OutputAsFloat);
+                    _writeDepthQ.Enqueue((exrBytes, depthItem.meta, depthItem.idx));
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("MainThread EncodeToEXR: " + e);
+                }
+                finally
+                {
+                    try { UnityEngine.Object.Destroy(depthItem.tex); } catch { }
+                }
+                framesProcessed++;
+            }
         }
     }
 

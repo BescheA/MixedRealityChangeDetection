@@ -93,7 +93,8 @@ public class loadMap : MonoBehaviour
     public bool enableDebugLogs = true;
     
     private GameObject scansContainer;
-    
+    public List<GameObject> rescanObjects;
+    public GameObject referenceObject;
     void Start()
     {
         Scenes = new Dictionary<string, bool>()
@@ -113,28 +114,62 @@ public class loadMap : MonoBehaviour
     }
     private void OnEnable()
     {
-        if (loadMapAction != null)
+        /*if (loadMapAction != null)
         {
             loadMapAction.action.performed += OnLoadMapAction;
             loadMapAction.action.Enable();
             if (enableDebugLogs) Debug.Log("LoadMapAction enabled");
-        }
+        }*/
     }
     private void OnDisable()
     {
-        if (loadMapAction != null)
+        /*if (loadMapAction != null)
         {
             loadMapAction.action.performed -= OnLoadMapAction;
             loadMapAction.action.Disable();
             if (enableDebugLogs) Debug.Log("LoadMapAction disabled");
-        }
+        }*/
     }
 
     private void OnLoadMapAction(InputAction.CallbackContext context)
     {
         LoadSelectedMap(SceneHash);
     }
-
+    /// <summary>
+    /// Setzt die Szene komplett zurück: entfernt ScansContainer, BoundingBoxes, Rescan-Objekte und das ReferenceObject.
+    /// </summary>
+    public void ResetScene()
+    {
+        if (scansContainer != null)
+        {
+            Destroy(scansContainer);
+            scansContainer = null;
+            if (enableDebugLogs) Debug.Log("[ResetScene] ScansContainer entfernt.");
+        }
+        if (changeDetectionVisualizer != null)
+        {
+            changeDetectionVisualizer.ClearBoundingBoxes();
+            if (enableDebugLogs) Debug.Log("[ResetScene] BoundingBoxes entfernt.");
+        }
+        if (rescanObjects != null && rescanObjects.Count > 0)
+        {
+            foreach (var obj in rescanObjects)
+            {
+                if (obj != null)
+                {
+                    Destroy(obj);
+                }
+            }
+            rescanObjects.Clear();
+            if (enableDebugLogs) Debug.Log("[ResetScene] rescanObjects entfernt und Liste geleert.");
+        }
+        if (referenceObject != null)
+        {
+            Destroy(referenceObject);
+            referenceObject = null;
+            if (enableDebugLogs) Debug.Log("[ResetScene] referenceObject entfernt.");
+        }
+    }
     /// <summary>
     /// Loads a map with change detection data for the specified scene hash
     /// </summary>
@@ -142,6 +177,20 @@ public class loadMap : MonoBehaviour
     public void LoadSelectedMap(string mapReference) 
     {   
         Debug.Log($"[LoadMap] LoadSelectedMap called with mapReference: '{mapReference}'");
+
+        // --- PATCH: Remove old containers before loading new map ---
+        if (scansContainer != null)
+        {
+            Destroy(scansContainer);
+            scansContainer = null;
+            if (enableDebugLogs) Debug.Log("[LoadMap] Destroyed old ScansContainer before loading new map");
+        }
+        if (changeDetectionVisualizer != null)
+        {
+            changeDetectionVisualizer.ClearBoundingBoxes();
+            if (enableDebugLogs) Debug.Log("[LoadMap] Cleared old bounding boxes before loading new map");
+        }
+
         
         if(string.IsNullOrEmpty(mapReference))
         {
@@ -180,20 +229,143 @@ public class loadMap : MonoBehaviour
         StartCoroutine(LoadMapDataFromStreamingAssets(Path.GetFileName(mapDataPath), mapReference));
         return;
 #else
-        string fullPath = mapDataPath;
-        
-        if (!File.Exists(fullPath))
-        {
-            Debug.LogError($"JSON file not found: {fullPath}");
-            Debug.LogError($"Ensure the file exists in Assets/StreamingAssets/{Path.GetFileName(mapDataPath)}");
-            return;
+        if(mapReference.Equals("flat")) {
+            processFlatMap();
+        } else
+        {        
+            string fullPath = mapDataPath;
+            if (!File.Exists(fullPath))
+            {
+                Debug.LogError($"JSON file not found: {fullPath}");
+                Debug.LogError($"Ensure the file exists in Assets/StreamingAssets/{Path.GetFileName(mapDataPath)}");
+                return;
+            }
+            MapData mapData = LoadMapData(fullPath);
+            ProcessMapData(mapData, mapReference);
         }
-
-        MapData mapData = LoadMapData(fullPath);
-        ProcessMapData(mapData, mapReference);
 #endif
     }
 
+    private void processFlatMap()
+    {
+        if (scansContainer != null)
+        {
+            Destroy(scansContainer);
+            if (enableDebugLogs) Debug.Log("[ProcessMapData] Destroyed old ScansContainer");
+        }
+        
+        scansContainer = new GameObject($"ScansContainer_flat");
+        scansContainer.transform.position = spawnPosition;
+        scansContainer.transform.rotation = Quaternion.Euler(globalRotation);
+        scansContainer.transform.localScale = Vector3.one * spawnScale;
+
+
+        if (RoomTable != null)
+        {
+            Room room = RoomTable.GetRoomByReference("run1_1");
+            if (room != null && room.roomMesh != null)
+            {
+                roomMesh = room.roomMesh;
+                var go = Instantiate(roomMesh, Vector3.zero, Quaternion.identity, scansContainer.transform);
+                go.transform.localPosition = Vector3.zero;
+                go.transform.localRotation = Quaternion.identity;
+                go.name = $"{roomMesh.name}_reference";
+                // Set material to fully opaque
+                go.gameObject.GetComponentInChildren<MeshRenderer>().material.color = new Color(
+                    go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.r,
+                    go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.g, 
+                    go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.b,
+                    1);
+                referenceObject = go;
+                Debug.Log($"Reference object set to: {referenceObject}");
+            }
+            else
+            {
+                Debug.LogError($"Room or room mesh not found in RoomTable for reference. Please ensure RoomTable is assigned and contains the reference.");
+                return;
+            }
+        }
+        else if (roomMesh != null)
+        {
+            if (enableDebugLogs) Debug.Log("Instantiating default reference mesh at position (0,0,0)");
+            Instantiate(roomMesh, Vector3.zero, Quaternion.identity, scansContainer.transform);
+        }
+        else
+        {
+            Debug.LogError("Cannot instantiate reference mesh: RoomTable is null and no default roomMesh assigned. Please assign RoomTable or roomMesh in Inspector.");
+            return;
+        }
+
+        if (RoomTable != null) 
+        {
+            int i = 0;
+            foreach (var scan in RoomTable.rooms) 
+            {
+                Debug.Log($"[ProcessMapData] Processing scan with reference: '{scan.reference}'");
+                
+                if (RoomTable.GetRoomByReference(scan.reference) == null)
+                {
+                    Debug.LogWarning($"Scan {scan.reference} not found in RoomTable - skipping");
+                    continue;
+                }
+                
+                GameObject scanRoomMesh = RoomTable.GetRoomByReference(scan.reference).roomMesh;
+                
+                if (scanRoomMesh == null)
+                {
+                    if (enableDebugLogs) Debug.LogWarning($"No room mesh found for reference: {scan.reference} - skipping");
+                    continue;
+                }
+
+                if (GameObject.Find(scanRoomMesh.name) != null)
+                {
+                    if (enableDebugLogs) Debug.Log($"Room Mesh {scanRoomMesh.name} already instantiated - skipping");
+                    continue;
+                }
+
+                    try
+                    {
+      
+                        var go = Instantiate(scanRoomMesh, scansContainer.transform);
+                        //
+                        i++;
+                        go.transform.localPosition = Vector3.zero;
+                        go.transform.localRotation = Quaternion.identity;
+                        go.name = $"{scanRoomMesh.name}_{scan.reference}";
+                        go.gameObject.GetComponentInChildren<MeshRenderer>().material.color = new Color(
+                            go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.r, 
+                            go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.g, 
+                            go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.b, 
+                            0);
+                        rescanObjects.Add(go);
+                        go.SetActive(false);
+                        //go.gameObject.SetActive(false); // Start inactive, will be activated via slider
+
+                        if (enableDebugLogs) Debug.Log($"Instantiated rescan object local position: {go.transform.localPosition} | global position: {go.transform.position}");
+
+                    }
+                    catch (Exception e)
+                    {
+                        if (enableDebugLogs) Debug.LogWarning($"Error processing scan {scan.reference}: {e.Message}");
+                    }
+            }
+            mapViewerController.SetSliderProps(1f / RoomTable.rooms.Length+1);
+        }
+        
+        // After all meshes are spawned, resize parent collider to fit all children
+        ResizeParentCollider();
+        
+        // Initialize the MapViewerController with the spawned container
+        if (mapViewerController != null)
+        {
+            mapViewerController.Initialize(scansContainer);
+            if (enableDebugLogs) Debug.Log("[ProcessMapData] MapViewerController initialized");
+        }
+        else
+        {
+            Debug.LogWarning("[ProcessMapData] MapViewerController not assigned in Inspector");
+        }
+    }
 #if UNITY_ANDROID && !UNITY_EDITOR
     private System.Collections.IEnumerator LoadMapDataFromStreamingAssets(string relativePath, string mapReference)
     {
@@ -219,7 +391,10 @@ public class loadMap : MonoBehaviour
                 Debug.LogError($"[LoadMap-Android]   - {res.name}");
             }
         }
-        
+        if(mapReference.Equals("flat")) {
+            processFlatMap();
+            yield break;
+        }
         string fullPath = Path.Combine(Application.streamingAssetsPath, relativePath);
         
         using (UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(fullPath))
@@ -253,11 +428,16 @@ public class loadMap : MonoBehaviour
             return;
         }
         
+        // --- Sicherstellen, dass BoundingBoxes IMMER zum aktuellen Map geladen werden ---
         if (changeDetectionVisualizer != null && visualizeRemovedObjects)
         {
-            changeDetectionVisualizer.LoadDatabases(mapReference);
-            // Ambiguity Analyse direkt nach Laden durchführen
-            changeDetectionVisualizer.AnalyzeAmbiguity(mapData);
+            changeDetectionVisualizer.ClearBoundingBoxes();
+            if (enableDebugLogs) Debug.Log($"[ProcessMapData] Alte BoundingBoxes entfernt vor Laden von {mapReference}");
+            changeDetectionVisualizer.LoadDatabases(mapReference, () => {
+                if (enableDebugLogs) Debug.Log($"[ProcessMapData] Datenbank für BoundingBoxes mit mapReference {mapReference} geladen (Callback)");
+                changeDetectionVisualizer.AnalyzeAmbiguity(mapData);
+                if (enableDebugLogs) Debug.Log($"[ProcessMapData] Ambiguitätsanalyse für BoundingBoxes durchgeführt (Callback)");
+            });
         }
         
         // Extract and log rigid transform data
@@ -279,6 +459,7 @@ public class loadMap : MonoBehaviour
         scansContainer.transform.localScale = Vector3.one * spawnScale;
         
         // Add Rigidbody for physics-based interaction
+        /*
         var rigidbody = scansContainer.AddComponent<Rigidbody>();
         rigidbody.isKinematic = true; // kinematic so it doesn't fall
         rigidbody.useGravity = false;
@@ -291,7 +472,7 @@ public class loadMap : MonoBehaviour
         // Add XRGrabInteractable for Meta XR controller grabbing
         var grabInteractable = scansContainer.AddComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
         grabInteractable.trackPosition = true;
-        grabInteractable.trackRotation = true;
+        grabInteractable.trackRotation = true;*/
         
         
         if (enableDebugLogs) Debug.Log($"Scans container created with global rotation: {globalRotation}");
@@ -310,6 +491,14 @@ public class loadMap : MonoBehaviour
                 go.transform.localPosition = Vector3.zero;
                 go.transform.localRotation = Quaternion.identity;
                 go.name = $"{roomMesh.name}_reference";
+                // Set material to fully opaque
+                go.gameObject.GetComponentInChildren<MeshRenderer>().material.color = new Color(
+                    go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.r,
+                    go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.g, 
+                    go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.b,
+                    1);
+                referenceObject = go;
+                Debug.Log($"Reference object set to: {referenceObject}");
                 if (enableDebugLogs) Debug.Log($"Instantiated initial reference: {mapReference} at local position (0,0,0), global position: {go.transform.position}");
             }
             else
@@ -332,6 +521,7 @@ public class loadMap : MonoBehaviour
         if (RoomTable != null && mapData.scans != null) 
         {
             Debug.Log($"[ProcessMapData] Processing {mapData.scans.Count} scans");
+            int i = 0;
             foreach (var scan in mapData.scans) 
             {
                 Debug.Log($"[ProcessMapData] Processing scan with reference: '{scan.reference}'");
@@ -396,9 +586,19 @@ public class loadMap : MonoBehaviour
                         }
                         
                         var go = Instantiate(scanRoomMesh, scansContainer.transform);
+                        //
+                        i++;
                         go.transform.localPosition = position;
                         go.transform.localRotation = rotation;
                         go.name = $"{scanRoomMesh.name}_{scan.reference}";
+                        go.gameObject.GetComponentInChildren<MeshRenderer>().material.color = new Color(
+                            go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.r, 
+                            go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.g, 
+                            go.gameObject.GetComponentInChildren<MeshRenderer>().material.color.b, 
+                            0);
+                        rescanObjects.Add(go);
+                        //go.gameObject.SetActive(false); // Start inactive, will be activated via slider
+
                         if (enableDebugLogs) Debug.Log($"Instantiated rescan object local position: {go.transform.localPosition} | global position: {go.transform.position}");
                         
                         if (changeDetectionVisualizer != null && visualizeRemovedObjects)
@@ -428,6 +628,7 @@ public class loadMap : MonoBehaviour
                     if (enableDebugLogs) Debug.LogWarning($"No global transformation found for scan: {scan.reference} - skipping");
                 }
             }
+            mapViewerController.SetSliderProps(1f / mapData.scans.Count+2, changeDetectionVisualizer.boundingBoxContainer);
         }
         
         // After all meshes are spawned, resize parent collider to fit all children

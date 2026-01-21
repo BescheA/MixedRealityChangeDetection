@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Handles UI-based manipulation of the loaded map visualization
@@ -25,6 +28,17 @@ public class MapViewerController : MonoBehaviour
     private bool scalingUp = false;
     private bool scalingDown = false;
 
+    private float sliderValue = 0f;
+    private float steps = 0f;
+    private GameObject boundingBoxContainer;
+
+    [Header("UI References")]
+    public Slider timestampSlider;
+
+    [Header("Manager References")]
+
+    public loadMap mapLoader;
+
     /// <summary>
     /// Initialize the controller with a map container
     /// Call this after the map is spawned
@@ -33,6 +47,9 @@ public class MapViewerController : MonoBehaviour
     {
         mapContainer = container;
         if (enableDebugLogs) Debug.Log($"[MapViewerController] Initialized with container: {container.name}");
+        mapLoader = FindFirstObjectByType<loadMap>();
+        timestampSlider.value = 0;
+        sliderValue = timestampSlider.value;
     }
 
     void Update()
@@ -40,22 +57,36 @@ public class MapViewerController : MonoBehaviour
         // Only process if container exists
         if (mapContainer == null) return;
 
-        // Apply rotations based on active states
+        // Calculate the geometric center of all child renderers
+        Renderer[] renderers = mapContainer.GetComponentsInChildren<Renderer>();
+        Vector3 rotationCenter = mapContainer.transform.position;
+        
+        if (renderers.Length > 0)
+        {
+            Bounds bounds = renderers[0].bounds;
+            foreach (Renderer r in renderers)
+            {
+                bounds.Encapsulate(r.bounds);
+            }
+            rotationCenter = bounds.center;
+        }
+
+        // Apply rotations based on active states (rotate around geometric center)
         if (rotatingUp)
         {
-            mapContainer.transform.Rotate(-rotationSpeed * Time.deltaTime, 0, 0, Space.Self);
+            mapContainer.transform.RotateAround(rotationCenter, mapContainer.transform.right, -rotationSpeed * Time.deltaTime);
         }
         if (rotatingDown)
         {
-            mapContainer.transform.Rotate(rotationSpeed * Time.deltaTime, 0, 0, Space.Self);
+            mapContainer.transform.RotateAround(rotationCenter, mapContainer.transform.right, rotationSpeed * Time.deltaTime);
         }
         if (rotatingLeft)
         {
-            mapContainer.transform.Rotate(0, -rotationSpeed * Time.deltaTime, 0, Space.World);
+            mapContainer.transform.RotateAround(rotationCenter, Vector3.up, -rotationSpeed * Time.deltaTime);
         }
         if (rotatingRight)
         {
-            mapContainer.transform.Rotate(0, rotationSpeed * Time.deltaTime, 0, Space.World);
+            mapContainer.transform.RotateAround(rotationCenter, Vector3.up, rotationSpeed * Time.deltaTime);
         }
 
         // Apply scaling based on active states
@@ -189,6 +220,220 @@ public class MapViewerController : MonoBehaviour
     {
         scalingDown = false;
         if (enableDebugLogs) Debug.Log("[MapViewerController] Stop Scale Down");
+    }
+
+    public void OnSliderChange()
+    {
+        sliderValue = timestampSlider.value;
+        
+        // Update mesh visibility and transparency based on slider value
+        if (mapLoader != null)
+        {
+            UpdateMeshFading(sliderValue);
+        }
+    }
+
+    /// <summary>
+    /// Updates mesh transparency and visibility based on slider position
+    /// Smoothly crossfades between consecutive meshes: reference (0) → rescan1 (0.25) → rescan2 (0.5) etc
+    /// Each mesh occupies exactly one segment of the slider range
+    /// </summary>
+    private void UpdateMeshFading(float sliderValue)
+    {
+        GameObject referenceObject = mapLoader.referenceObject;
+        List<GameObject> rescanObjects = mapLoader.rescanObjects;
+
+        if (referenceObject == null || rescanObjects == null || rescanObjects.Count == 0)
+        {
+            if (enableDebugLogs) Debug.LogWarning("[MapViewerController] Reference or rescan objects not available");
+            return;
+        }
+
+        // Build ordered list: index 0 = reference, indices 1..N = rescans
+        List<GameObject> allMeshes = new List<GameObject>(rescanObjects.Count + 1);
+        allMeshes.Add(referenceObject);
+        allMeshes.AddRange(rescanObjects);
+
+        int totalMeshes = allMeshes.Count;
+        float segmentSize = 1f / totalMeshes;
+
+        // Determine which mesh pair is currently transitioning
+        int prevIndex = Mathf.Clamp(Mathf.FloorToInt(sliderValue / segmentSize), 0, totalMeshes - 1);
+        int nextIndex = Mathf.Min(prevIndex + 1, totalMeshes - 1);
+        
+        // Blend within current segment: 0 = fully prev mesh, 1 = fully next mesh
+        float segmentStart = prevIndex * segmentSize;
+        float blend = (sliderValue - segmentStart) / segmentSize;
+        blend = Mathf.Clamp01(blend);
+
+        // Use a threshold for hard-switching instead of transparency to avoid rendering issues
+        const float switchThreshold = 0.5f;
+
+        // Ensure we have a bounding box container reference
+        GameObject currentBoundingBoxContainer = GetBoundingBoxContainer();
+
+        // Handle bounding boxes: only visible when not showing reference alone
+        bool showBoundingBoxes = sliderValue > 0f;
+        if (currentBoundingBoxContainer != null)
+        {
+            currentBoundingBoxContainer.SetActive(showBoundingBoxes);
+        }
+
+        // Update all meshes - use hard switching to avoid transparency issues
+        for (int i = 0; i < allMeshes.Count; i++)
+        {
+            GameObject mesh = allMeshes[i];
+            if (mesh == null) continue;
+
+            bool isActive = false;
+
+            if (i == prevIndex && i == nextIndex)
+            {
+                // Single mesh in its segment (at slider endpoint)
+                isActive = true;
+            }
+            else if (i == prevIndex)
+            {
+                // Previous mesh visible until threshold
+                isActive = blend < switchThreshold;
+            }
+            else if (i == nextIndex)
+            {
+                // Next mesh visible after threshold
+                isActive = blend >= switchThreshold;
+            }
+            else
+            {
+                // All other meshes are hidden
+                isActive = false;
+            }
+
+            mesh.SetActive(isActive);
+            
+            // Keep materials fully opaque to avoid rendering issues
+            if (isActive)
+            {
+                SetMeshFullyOpaque(mesh);
+            }
+        }
+
+        if (enableDebugLogs)
+        {
+            Debug.Log($"[MapViewerController] Slider: {sliderValue:F2}, Prev: {prevIndex} (active: {blend < switchThreshold}), Next: {nextIndex} (active: {blend >= switchThreshold}), Blend: {blend:F2}");
+        }
+    }
+
+    /// <summary>
+    /// Ensures a mesh is fully opaque without any transparency
+    /// </summary>
+    private void SetMeshFullyOpaque(GameObject meshObject)
+    {
+        if (meshObject == null) return;
+
+        Renderer[] renderers = meshObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            if (renderer.material.HasProperty("_Color"))
+            {
+                Color color = renderer.material.color;
+                color.a = 1f;
+                renderer.material.color = color;
+            }
+            
+            // Ensure opaque rendering mode
+            if (renderer.material.HasProperty("_Surface"))
+            {
+                renderer.material.SetFloat("_Surface", 0f); // Opaque
+            }
+            
+            renderer.material.renderQueue = 2000; // Opaque queue
+        }
+    }
+
+    /// <summary>
+    /// Sets the visibility of a mesh using dithered alpha clipping instead of transparency
+    /// This avoids Z-fighting and rendering issues with transparent materials
+    /// </summary>
+    private void SetMeshTransparency(GameObject meshObject, float alpha)
+    {
+        if (meshObject == null) return;
+
+        Renderer[] renderers = meshObject.GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            // Simple approach: use renderer alpha for fading, but keep materials opaque
+            // This uses the renderer's alpha multiplier which affects the final color without changing render mode
+            Color currentColor = renderer.material.color;
+            
+            // Only modify alpha channel, keep RGB intact
+            currentColor.a = alpha;
+            renderer.material.color = currentColor;
+            
+            // Keep material in opaque mode to avoid transparency rendering issues
+            // The alpha will still affect the final appearance through the color multiplier
+            if (renderer.material.HasProperty("_Surface"))
+            {
+                renderer.material.SetFloat("_Surface", 0f); // Force Opaque mode
+            }
+            
+            // Use AlphaTest/Cutout mode instead of Blend for cleaner rendering
+            if (renderer.material.HasProperty("_Mode"))
+            {
+                renderer.material.SetFloat("_Mode", 1); // Cutout mode
+            }
+            
+            if (renderer.material.HasProperty("_Cutoff"))
+            {
+                // Map alpha to cutoff threshold for dithered appearance
+                float cutoff = 1f - alpha;
+                renderer.material.SetFloat("_Cutoff", cutoff);
+            }
+            
+            renderer.material.renderQueue = 2450; // AlphaTest queue (between Opaque and Transparent)
+        }
+    }
+
+    public void SetSliderProps(float steps, GameObject boundingBoxContainer)
+    {
+        Debug.Log("Setting slider properties");
+        timestampSlider.minValue = 0;
+        timestampSlider.maxValue = 1;
+        timestampSlider.wholeNumbers = false;
+        timestampSlider.value = 0;
+        this.steps = steps; // Slider clamped between 0 and 1
+        this.boundingBoxContainer = boundingBoxContainer;
+    }
+    public void SetSliderProps(float steps)
+    {
+        Debug.Log("Setting slider properties");
+        timestampSlider.minValue = 0;
+        timestampSlider.maxValue = 1;
+        timestampSlider.wholeNumbers = false;
+        timestampSlider.value = 0;
+        this.steps = steps; // Slider clamped between 0 and 1
+        this.boundingBoxContainer = null;
+    }
+
+    /// <summary>
+    /// Safely returns the bounding box container, refreshing the reference if the old one was destroyed
+    /// </summary>
+    private GameObject GetBoundingBoxContainer()
+    {
+        // Unity destroys objects but leaves a missing reference that compares equal to null
+        if (boundingBoxContainer == null || !boundingBoxContainer)
+        {
+            if (mapLoader != null && mapLoader.changeDetectionVisualizer != null)
+            {
+                boundingBoxContainer = mapLoader.changeDetectionVisualizer.boundingBoxContainer;
+            }
+        }
+
+        if (boundingBoxContainer == null && enableDebugLogs)
+        {
+            Debug.LogWarning("[MapViewerController] BoundingBoxContainer not available (may be cleared during scene switch)");
+        }
+
+        return boundingBoxContainer;
     }
 
     #endregion

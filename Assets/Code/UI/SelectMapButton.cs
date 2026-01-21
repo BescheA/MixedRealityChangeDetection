@@ -107,6 +107,7 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
 
         // Lade die Map
         if (debugLogs) Debug.Log($"[SelectMapButton] Loading map: {mapReference} from toggle: {activeToggle.name}");
+        
         mapLoader.LoadSelectedMap(mapReference);
 
         // Schalte UI um
