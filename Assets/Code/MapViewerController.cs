@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -30,7 +29,6 @@ public class MapViewerController : MonoBehaviour
 
     private float sliderValue = 0f;
     private float steps = 0f;
-    private GameObject boundingBoxContainer;
 
     [Header("UI References")]
     public Slider timestampSlider;
@@ -269,16 +267,6 @@ public class MapViewerController : MonoBehaviour
         // Use a threshold for hard-switching instead of transparency to avoid rendering issues
         const float switchThreshold = 0.5f;
 
-        // Ensure we have a bounding box container reference
-        GameObject currentBoundingBoxContainer = GetBoundingBoxContainer();
-
-        // Handle bounding boxes: only visible when not showing reference alone
-        bool showBoundingBoxes = sliderValue > 0f;
-        if (currentBoundingBoxContainer != null)
-        {
-            currentBoundingBoxContainer.SetActive(showBoundingBoxes);
-        }
-
         // Update all meshes - use hard switching to avoid transparency issues
         for (int i = 0; i < allMeshes.Count; i++)
         {
@@ -350,59 +338,6 @@ public class MapViewerController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Sets the visibility of a mesh using dithered alpha clipping instead of transparency
-    /// This avoids Z-fighting and rendering issues with transparent materials
-    /// </summary>
-    private void SetMeshTransparency(GameObject meshObject, float alpha)
-    {
-        if (meshObject == null) return;
-
-        Renderer[] renderers = meshObject.GetComponentsInChildren<Renderer>();
-        foreach (Renderer renderer in renderers)
-        {
-            // Simple approach: use renderer alpha for fading, but keep materials opaque
-            // This uses the renderer's alpha multiplier which affects the final color without changing render mode
-            Color currentColor = renderer.material.color;
-            
-            // Only modify alpha channel, keep RGB intact
-            currentColor.a = alpha;
-            renderer.material.color = currentColor;
-            
-            // Keep material in opaque mode to avoid transparency rendering issues
-            // The alpha will still affect the final appearance through the color multiplier
-            if (renderer.material.HasProperty("_Surface"))
-            {
-                renderer.material.SetFloat("_Surface", 0f); // Force Opaque mode
-            }
-            
-            // Use AlphaTest/Cutout mode instead of Blend for cleaner rendering
-            if (renderer.material.HasProperty("_Mode"))
-            {
-                renderer.material.SetFloat("_Mode", 1); // Cutout mode
-            }
-            
-            if (renderer.material.HasProperty("_Cutoff"))
-            {
-                // Map alpha to cutoff threshold for dithered appearance
-                float cutoff = 1f - alpha;
-                renderer.material.SetFloat("_Cutoff", cutoff);
-            }
-            
-            renderer.material.renderQueue = 2450; // AlphaTest queue (between Opaque and Transparent)
-        }
-    }
-
-    public void SetSliderProps(float steps, GameObject boundingBoxContainer)
-    {
-        Debug.Log("Setting slider properties");
-        timestampSlider.minValue = 0;
-        timestampSlider.maxValue = 1;
-        timestampSlider.wholeNumbers = false;
-        timestampSlider.value = 0;
-        this.steps = steps; // Slider clamped between 0 and 1
-        this.boundingBoxContainer = boundingBoxContainer;
-    }
     public void SetSliderProps(float steps)
     {
         Debug.Log("Setting slider properties");
@@ -411,29 +346,6 @@ public class MapViewerController : MonoBehaviour
         timestampSlider.wholeNumbers = false;
         timestampSlider.value = 0;
         this.steps = steps; // Slider clamped between 0 and 1
-        this.boundingBoxContainer = null;
-    }
-
-    /// <summary>
-    /// Safely returns the bounding box container, refreshing the reference if the old one was destroyed
-    /// </summary>
-    private GameObject GetBoundingBoxContainer()
-    {
-        // Unity destroys objects but leaves a missing reference that compares equal to null
-        if (boundingBoxContainer == null || !boundingBoxContainer)
-        {
-            if (mapLoader != null && mapLoader.changeDetectionVisualizer != null)
-            {
-                boundingBoxContainer = mapLoader.changeDetectionVisualizer.boundingBoxContainer;
-            }
-        }
-
-        if (boundingBoxContainer == null && enableDebugLogs)
-        {
-            Debug.LogWarning("[MapViewerController] BoundingBoxContainer not available (may be cleared during scene switch)");
-        }
-
-        return boundingBoxContainer;
     }
 
     #endregion

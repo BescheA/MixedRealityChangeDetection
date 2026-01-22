@@ -2,16 +2,16 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// SelectButton: Prüft welcher Toggle in der ToggleGroup aktiv ist und lädt die entsprechende Map
-/// Schaltet dann die UI um: versteckt Selection-Menü, zeigt Map-Viewer-Menü
+/// SelectButton: checks which toggle in the ToggleGroup is active and loads the corresponding map
+/// Then switches the UI: hides the selection menu and shows the map viewer menu
 /// </summary>
 public class SelectMapButton : MonoBehaviour, IButtonBehaviour
 {
     [Header("References")]
     [SerializeField] private ToggleGroup mapToggleGroup;
     [SerializeField] private loadMap mapLoader;
-    [SerializeField] private GameObject mapSelectionMenu; // Map-Auswahl Menü
-    [SerializeField] private GameObject mapViewerMenu; // Map-Viewer Menü
+    [SerializeField] private GameObject mapSelectionMenu; // Map selection menu
+    [SerializeField] private GameObject mapViewerMenu; // Map viewer menu
 
     [Header("Settings")]
     [SerializeField] private bool debugLogs = true;
@@ -35,7 +35,7 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
             Debug.LogError($"[SelectMapButton] No Toggle component found on {gameObject.name}");
         }
 
-        // Auto-find wenn nicht zugewiesen
+        // Auto-find if not assigned
         if (mapToggleGroup == null || mapLoader == null || mapSelectionMenu == null || mapViewerMenu == null)
         {
             AutoFindReferences();
@@ -51,7 +51,7 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
     }
 
     /// <summary>
-    /// Wird aufgerufen wenn der Toggle geändert wird
+    /// Invoked when the toggle state changes
     /// </summary>
     private void OnToggleChanged(bool isOn)
     {
@@ -62,9 +62,8 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
     }
 
     /// <summary>
-    /// Wird aufgerufen wenn der SelectButton aktiviert wird
-    /// Findet den aktiven Toggle in der ToggleGroup und lädt dessen Map
-    /// Schaltet dann die UI um (versteckt Selection, zeigt Map-Viewer)
+    /// Called when the select button activates.
+    /// Finds the active toggle in the ToggleGroup, loads its map, then switches UI (hide selection, show viewer).
     /// </summary>
     public void Execute()
     {
@@ -82,7 +81,7 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
             return;
         }
 
-        // Finde den aktiven Toggle
+        // Find the active toggle
         Toggle activeToggle = GetActiveToggle();
         if (activeToggle == null)
         {
@@ -90,7 +89,7 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
             return;
         }
 
-        // Hole die mapReference vom aktiven Toggle
+        // Get the mapReference from the active toggle
         LoadMapButton mapToggle = activeToggle.GetComponent<LoadMapButton>();
         if (mapToggle == null)
         {
@@ -105,23 +104,23 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
             return;
         }
 
-        // Lade die Map
+        // Load the map
         if (debugLogs) Debug.Log($"[SelectMapButton] Loading map: {mapReference} from toggle: {activeToggle.name}");
         
         mapLoader.LoadSelectedMap(mapReference);
 
-        // Schalte UI um
+        // Switch UI
         SwitchUI();
     }
 
     /// <summary>
-    /// Schaltet die UI um: versteckt Selection-Menü, zeigt Map-Viewer-Menü
+    /// Switches the UI: hides the selection menu and shows the map viewer menu
     /// </summary>
     private void SwitchUI()
     {
         if (debugLogs) Debug.Log("[SelectMapButton] Switching UI");
 
-        // Verstecke Map-Auswahl Menü
+        // Hide map selection menu
         if (mapSelectionMenu != null)
         {
             mapSelectionMenu.SetActive(false);
@@ -132,7 +131,7 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
             Debug.LogWarning("[SelectMapButton] mapSelectionMenu is null");
         }
 
-        // Zeige Map-Viewer Menü
+        // Show map viewer menu
         if (mapViewerMenu != null)
         {
             mapViewerMenu.SetActive(true);
@@ -145,14 +144,14 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
     }
 
     /// <summary>
-    /// Findet den aktiven Toggle in der ToggleGroup
+    /// Finds the active toggle in the ToggleGroup
     /// </summary>
     private Toggle GetActiveToggle()
     {
         if (mapToggleGroup == null)
             return null;
 
-        // Iteriere durch alle Toggles in der ToggleGroup
+        // Iterate through all toggles in the ToggleGroup
         foreach (var toggle in mapToggleGroup.ActiveToggles())
         {
             if (toggle.isOn)
@@ -165,17 +164,17 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
     }
 
     /// <summary>
-    /// Auto-Finder für Referenzen
+    /// Auto-finds missing references
     /// </summary>
     private void AutoFindReferences()
     {
-        // Finde mapLoader
+        // Find mapLoader
         if (mapLoader == null)
         {
             mapLoader = FindFirstObjectByType<loadMap>();
         }
 
-        // Finde ToggleGroup
+        // Find ToggleGroup
         if (mapToggleGroup == null)
         {
             var allObjects = FindObjectsByType<ToggleGroup>(FindObjectsSortMode.None);
@@ -189,7 +188,7 @@ public class SelectMapButton : MonoBehaviour, IButtonBehaviour
             }
         }
 
-        // Finde Selection und Viewer Menüs
+        // Find selection and viewer menus
         if (mapSelectionMenu == null || mapViewerMenu == null)
         {
             var allGameObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);

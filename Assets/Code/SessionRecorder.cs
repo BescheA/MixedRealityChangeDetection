@@ -249,8 +249,8 @@ public class SessionRecorder : MonoBehaviour
     }
 
 
-    // Encoder-Thread entfernt, Encoding läuft jetzt im Main Thread (Update)
-    // Dummy-Methoden für Kompatibilität (werden nicht mehr genutzt)
+    // Encoder thread removed; encoding now runs on the main thread (Update)
+    // Dummy methods for compatibility (no longer used)
     void StartEncoderThread() { }
     void StopEncoderThread() { }
 
@@ -258,7 +258,7 @@ public class SessionRecorder : MonoBehaviour
     {
         if (!_recording) return;
 
-        // Encoding jetzt im Main Thread: PNG/EXR Encoding und Übergabe an Write-Queue
+        // Encoding now runs on the main thread: PNG/EXR encoding and handoff to the write queue
         int maxFramesPerUpdate = 4; // Limitiert, um Framedrops zu vermeiden
         int framesProcessed = 0;
 

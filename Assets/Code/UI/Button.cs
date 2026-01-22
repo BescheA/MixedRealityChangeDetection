@@ -1,8 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Interface für Button-Verhalten
-/// Alle Button-Verhalten müssen diese Schnittstelle implementieren
+/// Interface for button behaviour
+/// All button behaviours must implement this interface
 /// </summary>
 public interface IButtonBehaviour
 {

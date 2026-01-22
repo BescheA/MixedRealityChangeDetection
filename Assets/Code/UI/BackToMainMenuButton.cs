@@ -2,15 +2,15 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// BackToMainMenuButton: Zerstört das geladene Map-GameObject und resettet die Toggles
-/// Schaltet UI zurück: versteckt Map-Viewer, zeigt Selection-Menü
+/// BackToMainMenuButton: destroys the loaded map GameObject and resets the toggles
+/// Switches UI back: hides the map viewer and shows the selection menu
 /// </summary>
 public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
 {
     [Header("References")]
     [SerializeField] private ToggleGroup mapToggleGroup;
-    [SerializeField] private GameObject mapSelectionMenu; // Map-Auswahl Menü
-    [SerializeField] private GameObject mapViewerMenu; // Map-Viewer Menü
+    [SerializeField] private GameObject mapSelectionMenu; // Map selection menu
+    [SerializeField] private GameObject mapViewerMenu; // Map viewer menu
 
     [Header("Settings")]
     [SerializeField] private bool debugLogs = true;
@@ -34,7 +34,7 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
             Debug.LogError($"[BackToMainMenuButton] No Toggle component found on {gameObject.name}");
         }
 
-        // Auto-find ToggleGroup wenn nicht zugewiesen
+        // Auto-find ToggleGroup if not assigned
         if (mapToggleGroup == null || mapSelectionMenu == null || mapViewerMenu == null)
         {
             AutoFindReferences();
@@ -50,7 +50,7 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
     }
 
     /// <summary>
-    /// Wird aufgerufen wenn der Toggle geändert wird
+    /// Invoked when the toggle state changes
     /// </summary>
     private void OnToggleChanged(bool isOn)
     {
@@ -61,31 +61,30 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
     }
 
     /// <summary>
-    /// Wird aufgerufen wenn der BackButton aktiviert wird
-    /// Zerstört ScansContainer, resettet Toggles, und schaltet UI zurück
+    /// Called when the back button activates: destroys the scans container, resets toggles, and switches UI back.
     /// </summary>
     public void Execute()
     {
         if (debugLogs) Debug.Log("[BackToMainMenuButton] Execute called");
 
-        // Zerstöre das geladene Map-GameObject (ScansContainer)
+        // Destroy the loaded map GameObject (scans container)
         DestroyScansContainer();
 
-        // Resettte alle Toggles in der ToggleGroup
+        // Reset all toggles in the ToggleGroup
         ResetToggles();
 
-        // Schalte UI zurück
+        // Switch UI back
         SwitchUIBack();
     }
 
     /// <summary>
-    /// Schaltet die UI zurück: versteckt Map-Viewer, zeigt Selection-Menü
+    /// Switches the UI back: hides the map viewer and shows the selection menu
     /// </summary>
     private void SwitchUIBack()
     {
         if (debugLogs) Debug.Log("[BackToMainMenuButton] Switching UI back");
 
-        // Verstecke Map-Viewer Menü
+        // Hide map viewer menu
         if (mapViewerMenu != null)
         {
             mapViewerMenu.SetActive(false);
@@ -96,7 +95,7 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
             Debug.LogWarning("[BackToMainMenuButton] mapViewerMenu is null");
         }
 
-        // Zeige Map-Auswahl Menü
+        // Show map selection menu
         if (mapSelectionMenu != null)
         {
             mapSelectionMenu.SetActive(true);
@@ -109,7 +108,7 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
     }
 
     /// <summary>
-    /// Zerstört den ScansContainer wenn vorhanden
+    /// Destroys the scans container if present
     /// </summary>
     private void DestroyScansContainer()
     {
@@ -125,7 +124,7 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
     }
 
     /// <summary>
-    /// Resettet alle Toggles in der ToggleGroup
+    /// Resets all toggles in the ToggleGroup
     /// </summary>
     private void ResetToggles()
     {
@@ -135,7 +134,7 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
             return;
         }
 
-        // Setze allowSwitchOff temporär auf true um alle Toggles zu deaktivieren
+        // Temporarily set allowSwitchOff to true to disable all toggles
         bool originalAllowSwitchOff = mapToggleGroup.allowSwitchOff;
         mapToggleGroup.allowSwitchOff = true;
 
@@ -145,18 +144,18 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
             if (debugLogs) Debug.Log($"[BackToMainMenuButton] Reset toggle: {toggle.name}");
         }
 
-        // Stelle ursprünglichen Wert wieder her
+        // Restore original value
         mapToggleGroup.allowSwitchOff = originalAllowSwitchOff;
 
         if (debugLogs) Debug.Log("[BackToMainMenuButton] All toggles reset");
     }
 
     /// <summary>
-    /// Auto-Finder für Referenzen
+    /// Auto-finds missing references
     /// </summary>
     private void AutoFindReferences()
     {
-        // Finde ToggleGroup
+        // Find ToggleGroup
         if (mapToggleGroup == null)
         {
             var allGroups = FindObjectsByType<ToggleGroup>(FindObjectsSortMode.None);
@@ -170,7 +169,7 @@ public class BackToMainMenuButton : MonoBehaviour, IButtonBehaviour
             }
         }
 
-        // Finde Selection und Viewer Menüs
+        // Find selection and viewer menus
         if (mapSelectionMenu == null || mapViewerMenu == null)
         {
             var allGameObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
