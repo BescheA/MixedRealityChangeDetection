@@ -234,6 +234,14 @@ Assets/
 │           └── RoomTable.asset      # Scene-specific room data
 └── Scenes/
     └── MainScene.unity
+Pipeline/
+├── depth.py                          #Extract Depth information from RGB inputs
+├── segment.py                        #Extract Semantic Information from RGB inputs
+├── pose_to_matrix.py                 #Convert camera pose data to required format
+├── merge_meshes.py                   #Merge object-level instances (from panoptic mapper) to scene-level mesh
+├── draw_frames.py                    #Visualize camera poses (debugging)
+├── examine_depth.py                  #Compare depth values across locations (debugging)
+
 ```
 
 ### Required Assets
